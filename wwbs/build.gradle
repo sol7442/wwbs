@@ -1,0 +1,55 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                   'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+	def springVer 		= "4.2.8.RELEASE"
+	def hibernateVer 	= "5.1.0.Final"
+	def springJpaVer 	= "1.10.3.RELEASE" 
+	def mysqlVer 		= "5.1.39"
+	def commonslVer 	= "1.4"
+	
+	providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+	compile "org.springframework:spring-webmvc:${springVer}"
+	compile "org.springframework.data:spring-data-jpa:${springJpaVer}"	
+	testCompile "org.springframework:spring-test:${springVer}"
+	testCompile group: 'junit', name: 'junit', version: '4.+'	
+		
+    compile "org.hibernate:hibernate-entitymanager:${hibernateVer}"
+    compile "mysql:mysql-connector-java:${mysqlVer}"  
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'	
+    	       
+	
+    compile 'org.slf4j:jcl-over-slf4j:1.7.21'
+	compile "ch.qos.logback:logback-classic:1.1.7"
+    
+    
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
