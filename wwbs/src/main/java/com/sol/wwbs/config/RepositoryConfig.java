@@ -24,9 +24,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan("com.mom.watch")
+@ComponentScan("com.sol.wwbs")
 @PropertySource("classpath:config.properties")
-@EnableJpaRepositories("com.mom.watch")
+@EnableJpaRepositories("com.sol.wwbs")
 public class RepositoryConfig {
     @Resource
     private Environment env;

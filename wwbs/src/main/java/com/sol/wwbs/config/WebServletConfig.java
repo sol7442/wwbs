@@ -16,7 +16,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @PropertySource("classpath:config.properties")
 @Configuration
 @EnableWebMvc
-@ComponentScan("com.mom.wwbs")
+@ComponentScan("com.sol.wwbs")
 public class WebServletConfig extends WebMvcConfigurerAdapter {
 
     @Resource

@@ -16,6 +16,7 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int taskId;
 
 	private int lft;
