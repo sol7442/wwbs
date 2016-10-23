@@ -21,11 +21,6 @@ public class NstTreeTest {
 	@Autowired
 	private TaskService taskService;
 	
-	@Test
-	public void testCreate(){
-		TaskTree tsktre = new TaskTree();
-		taskService.create(tsktre);
-	}
 	
 	@Test
 	public void testRoot(){
@@ -33,12 +28,11 @@ public class NstTreeTest {
 		taskService.createRoot(root);
 	}
 	
-	@Test
-	public void testFindRoot(){
-		List<TaskTree> roots = taskService.getRoots();
-		
-		for(TaskTree taktree : roots){
-			System.out.println(taktree.getTaskId() + ":("+taktree.getLeft()+")("+taktree.getRight()+")");
-		}
-	}
+//	@Test
+//	public void testFindRoot(){
+//		List<TaskTree> roots = taskService.getRoots();
+//		for(TaskTree taktree : roots){
+//			System.out.println(taktree.getTaskId() + ":("+taktree.getLeft()+")("+taktree.getRight()+")");
+//		}
+//	}
 }

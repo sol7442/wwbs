@@ -10,8 +10,7 @@ import com.sol.wwbs.util.tree.NestedSetsTreeNode;
  * 
  */
 @Entity
-@Table(name="TaskTree")
-//@NamedQuery(name="TaskTree.findAll", query="SELECT t FROM TaskTree t")
+@Table(name="_tree")
 public class TaskTree implements Serializable, NestedSetsTreeNode {
 	private static final long serialVersionUID = 1L;
 
@@ -19,10 +18,14 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int taskId;
 
+	private String name;
 	private int lft;
-
 	private int rgt;
 
+	@OneToOne(targetEntity=Task.class)
+	@JoinColumn(name="taskName")
+	private String task;
+	
 	//bi-directional many-to-one association to TskTree
 	@ManyToOne(targetEntity=TaskTree.class)
 	@JoinColumn(name="topLevel")
@@ -74,6 +77,28 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 		TaskTree clone = new TaskTree();
 		clone.setTopLevel(getTopLevel());
 		return clone;
+	}
+
+	@Override
+	public Serializable getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getTask() {
+		return task;
+	}
+
+	public void setTasK(String task) {
+		this.task = task;
 	}
 
 }
