@@ -54,7 +54,7 @@ public class RepositoryConfig {
 		dataSource.setMaxWait(env.getProperty("database.maxWait",Integer.class,30000));
 		dataSource.setDefaultAutoCommit(true);
 				
-		System.out.println("Config : dataSource");
+		System.out.println("Config : dataSource" + env.getProperty("database.jdbcUrl") );
 		return dataSource; 
 	}
 	
@@ -73,7 +73,7 @@ public class RepositoryConfig {
         
         entityManagerFactoryBean.setJpaProperties(properties);
        
-        System.out.println("Config : entityManagerFactory"); 
+        System.out.println("Config : entityManagerFactory" + env.getProperty("hibernate.dialect")); 
         return entityManagerFactoryBean;
     }
     

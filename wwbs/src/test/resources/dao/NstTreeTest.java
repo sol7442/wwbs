@@ -12,6 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.sol.wwbs.config.RepositoryConfig;
 import com.sol.wwbs.model.TaskTree;
 import com.sol.wwbs.service.TaskService;
+import com.sol.wwbs.util.tree.UniqueConstraintViolationException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=RepositoryConfig.class)
@@ -22,10 +23,25 @@ public class NstTreeTest {
 	private TaskService taskService;
 	
 	
+	//@Test
+	public void testCreateRoot(){
+		try {
+			TaskTree root = new TaskTree();
+			root.setName("Admin");
+			taskService.createRoot(root);
+		} catch (UniqueConstraintViolationException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test
-	public void testRoot(){
-		TaskTree root = new TaskTree();
-		taskService.createRoot(root);
+	public void testAddTask(){
+//		TaskTree root = new TaskTree();
+//		root.setName("Admin");
+//		taskService.createRoot(root);
+		TaskTree root = taskService.getRoot("Admin");
+		System.out.println(root);
+		//taskService.addChild(parent, child)
 	}
 	
 //	@Test

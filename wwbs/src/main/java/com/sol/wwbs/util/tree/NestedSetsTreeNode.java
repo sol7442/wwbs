@@ -60,13 +60,13 @@ public interface NestedSetsTreeNode extends TreeNode
 	 * as that name is used in DAO queries.
 	 * @return the root node of this tree node (root and topLevel are synonyms).
 	 */
-	NestedSetsTreeNode getTopLevel();
+	NestedSetsTreeNode getRoot();
 
 	/**
 	 * DO NOT use this, is for the DAO exclusively.
 	 * Sets the top-level root of this tree node.
 	 */
-	void setTopLevel(NestedSetsTreeNode topLevel);
+	void setRoot(NestedSetsTreeNode root);
 	
 	/**
 	 * For copy and unique constraint checking this is required.

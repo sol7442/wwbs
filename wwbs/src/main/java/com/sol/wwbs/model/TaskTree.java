@@ -1,6 +1,9 @@
 package com.sol.wwbs.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
 
@@ -16,73 +19,75 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int taskId;
-
-	private String name;
-	private int lft;
-	private int rgt;
-
-	@OneToOne(targetEntity=Task.class)
-	@JoinColumn(name="taskName")
-	private String task;
+	private int id;
 	
-	//bi-directional many-to-one association to TskTree
-	@ManyToOne(targetEntity=TaskTree.class)
-	@JoinColumn(name="topLevel")
-	private NestedSetsTreeNode topLevel;
+	private String name;
+	
+	@Column(name="lft")
+	private int left;
+	
+	@Column(name="rgt")
+	private int right;
 
+	@OneToMany(mappedBy = "tree")
+	private List<Task> tasks;
+	
+	@ManyToOne(targetEntity = TaskTree.class)
+	@JoinColumn(name="root")
+	private NestedSetsTreeNode root;
+
+	
 	public TaskTree() {
 	}
 
 	public int getTaskId() {
-		return this.taskId;
+		return this.id;
 	}
 
-	public void setTaskId(int taskId) {
-		this.taskId = taskId;
+	public void setTaskId(int id) {
+		this.id = id;
 	}
 
 	@Override
 	public int getLeft() {
-		return this.lft;	
+		return this.left;	
 	}
 
 	@Override
 	public void setLeft(int lft) {
-		this.lft = lft;
+		this.left = lft;
 	}
 
 	@Override
 	public int getRight() {
-		return this.rgt;
+		return this.right;
 	}
 
 	@Override
 	public void setRight(int rgt) {
-		this.rgt = rgt;
+		this.right = rgt;
 	}
 
 	@Override
-	public NestedSetsTreeNode getTopLevel() {
-		return this.topLevel;
+	public NestedSetsTreeNode getRoot() {
+		return this.root;
 	}
 
 	@Override
-	public void setTopLevel(NestedSetsTreeNode topLevel) {
-		this.topLevel = topLevel;
+	public void setRoot(NestedSetsTreeNode root) {
+		this.root = root;
 	}
 
 	@Override
 	public NestedSetsTreeNode clone() {
 		TaskTree clone = new TaskTree();
-		clone.setTopLevel(getTopLevel());
+		clone.setRoot(getRoot());
 		return clone;
 	}
 
 	@Override
 	public Serializable getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
 
 	public String getName() {
@@ -92,13 +97,28 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 
-	public String getTask() {
-		return task;
+	public List<Task> getTasks() {
+		return tasks;
 	}
 
-	public void setTasK(String task) {
-		this.task = task;
+	public void addTasK(Task task) {
+		if(this.tasks == null){
+			this.tasks = new ArrayList<Task>();
+		}
+		this.tasks.add(task);
+	}
+	
+	public String toString(){
+		StringBuffer buffer = new StringBuffer();
+		
+		buffer.append("[").append(this.id).append("]");
+		buffer.append("[").append(this.name).append("]");
+		buffer.append(":").append(this.left).append(",").append(this.right).append(",");
+		buffer.append(this.root);
+		
+		return buffer.toString();
 	}
 
 }
