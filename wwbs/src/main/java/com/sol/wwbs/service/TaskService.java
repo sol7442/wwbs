@@ -14,6 +14,10 @@ import com.sol.wwbs.util.tree.TreeActionLocation;
 import com.sol.wwbs.util.tree.TreeDao;
 import com.sol.wwbs.util.tree.UniqueConstraintViolationException;
 import com.sol.wwbs.util.tree.UniqueTreeConstraint;
+import com.sol.wwbs.util.tree.TreeActionLocation.ActionType;
+import com.sol.wwbs.util.tree.TreeActionLocation.RelatedNodeType;
+
+import fri.util.database.jpa.tree.nestedsets.NestedSetsTreeDao.Location;
 
 
 
@@ -28,7 +32,7 @@ public class TaskService implements TreeDao<TaskTree>{
 	private static final int ROOT_RIGHT = 2;
 	@Override
 	public boolean isPersistent(TaskTree entity) {
-		return entity.getId() != null;
+		return entity.getId() == null;
 	}
 	@Override
 	public TaskTree find(Serializable id) {
@@ -89,8 +93,7 @@ public class TaskService implements TreeDao<TaskTree>{
 	}
 	@Override
 	public boolean isLeaf(TaskTree node) {
-		// TODO Auto-generated method stub
-		return false;
+		return node.getLeft() + 1 == node.getRight();
 	}
 	@Override
 	public int getChildCount(TaskTree parent) {
@@ -163,7 +166,7 @@ public class TaskService implements TreeDao<TaskTree>{
 	}
 	private void createGap(int gapLeft, TaskTree root, int nodesCount) {
 		
-		//treeRepo.updateAddLeftGap(nodesCount*2, root,gapLeft);
+		treeRepo.updateAddLeftGap(nodesCount*2, root,gapLeft);
 		
 	//	gap("+", gapLeft, gapLeft, root, nodesCount);
 	}
@@ -279,8 +282,17 @@ public class TaskService implements TreeDao<TaskTree>{
 //		return null;
 //	}
 //	
-	private Location location(TaskTree root, int position, TaskTree moveNode, boolean isCopy){
-		Location location = null;//new Location(root, relatedNodeType, relatedNode, null, targetLeft);
+	private Location location(TaskTree parent, int position, TaskTree moveNode, ActionType type){
+		
+		if(isLeaf(parent)){
+			return new Location(parent.getRoot(), RelatedNodeType.PARENT, parent, type, parent.getLeft() + 1);
+		}
+		
+//		if (position <= UNDEFINED_POSITION){
+//			return new Location(parent.getTopLevel(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
+//		}
+		
+		
 		return location;
 	}
 	

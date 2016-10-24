@@ -1,6 +1,5 @@
 package dao;
 
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,12 +35,17 @@ public class NstTreeTest {
 	
 	@Test
 	public void testAddTask(){
-//		TaskTree root = new TaskTree();
-//		root.setName("Admin");
-//		taskService.createRoot(root);
-		TaskTree root = taskService.getRoot("Admin");
-		System.out.println(root);
-		//taskService.addChild(parent, child)
+		try {
+			TaskTree root = taskService.getRoot("Admin");
+			TaskTree sub = new TaskTree();
+			sub.setName("Main");
+			
+			System.out.println(root);
+			
+			taskService.addChild(root, sub);
+		} catch (UniqueConstraintViolationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	@Test
