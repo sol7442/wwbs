@@ -32,7 +32,7 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Task> tasks;
 	
-	@ManyToOne(targetEntity = TaskTree.class)
+	@ManyToOne(targetEntity = TaskTree.class)//, optional=true, fetch=FetchType.LAZY, cascade = CascadeType.REFRESH  )
 	@JoinColumn(name="root", nullable = true, updatable = true)
 	private TaskTree root;
 

@@ -51,6 +51,23 @@ public class NstTreeTest {
 			e.printStackTrace();
 		}
 	}
+	@Test
+	public void testManyAddTask(){
+		try {
+			TaskTree sub;// = new TaskTree();
+			for(int i=0;i<10;i++){
+				TaskTree root = taskService.getRoot("Admin");
+
+				sub = new TaskTree();
+				sub.setName("Sub" + i);
+				sub = taskService.addChild(root, sub);
+			}
+			
+			testGetChildTask();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	//@Test
 	public void testGetChildTask(){
@@ -67,7 +84,7 @@ public class NstTreeTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testRemoveTask(){
 		try {
 			TaskTree root = taskService.getRoot("Admin");
@@ -88,6 +105,64 @@ public class NstTreeTest {
 			e.printStackTrace();
 		}
 	}
+	
+//	//@Test
+//	public void testRemoveByNameTask(){
+//		try {
+//			TaskTree root = taskService.getRoot("Admin");
+//			List<TaskTree> list = taskService.getChildren(root);
+//			for(TaskTree tree : list){
+//				System.out.println(tree);
+//			}
+//			
+//			TaskTree del_task = list.get(list.size() - 1);
+//			taskService.removeByName(del_task.getName());
+//		
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	//@Test
+//	public void testRemoveByRangeTask(){
+//		try {
+//			TaskTree root = taskService.getRoot("Admin");
+//			List<TaskTree> list = taskService.getChildren(root);
+//			for(TaskTree tree : list){
+//				System.out.println(tree);
+//			}
+//			
+//			TaskTree del_task = list.get(list.size() - 1);
+//			taskService.removeByRange(del_task.getLeft(), del_task.getRight());
+//		
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	///@Test
+//	public void testRemameTask(){
+//		try {
+//			TaskTree root = taskService.getRoot("Admin");
+//			List<TaskTree> list = taskService.getChildren(root);
+//			for(TaskTree tree : list){
+//				System.out.println(tree);
+//			}
+//			
+//			TaskTree del_task = list.get(list.size() - 1);
+//			del_task.setName("ReNamed");
+//			taskService.rename(del_task);
+//		
+//			list = taskService.getChildren(root);
+//			for(TaskTree tree : list){
+//				System.out.println(tree);
+//			}
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 //	@Test
 //	public void testFindRoot(){

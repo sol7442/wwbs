@@ -219,17 +219,16 @@ public class TaskService implements TreeDao<TaskTree>{
 		if(node == null || !node.isPersistent()){
 			throw new IllegalArgumentException("Node is null or not persistent: "+node);
 		}
-		
-		treeRepo.flush();
-		//if(node.isRoot()){
-		treeRepo.updateRootNull(node);//, node.getLeft(),node.getRight());
-		//}
-		
+
 		final TaskTree root = (TaskTree)node.getRoot();
+		
+		if(node.isRoot()){
+			treeRepo.updateRootNull(root, node.getLeft(),node.getRight());
+		}
 		
 		System.out.println(node.toString() + ":" +node.getLeft() + "," + node.getRight());
 		
-		treeRepo.delete(node,node.getLeft(),node.getRight());
+		treeRepo.delete(root,node.getLeft(),node.getRight());
 		
 		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
 		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
@@ -238,6 +237,19 @@ public class TaskService implements TreeDao<TaskTree>{
 		
 		//treeRepo.flush();
 	}
+	
+
+//	public void rename(TaskTree node) {
+//		final TaskTree root = (TaskTree)node.getRoot();
+//		System.out.println(node.toString() + ":" +node.getLeft() + "," + node.getRight());
+//		
+//		treeRepo.rename(node.getName(),node.getLeft(),node.getRight());
+//		
+////		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
+////		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
+//		
+//	}
+	
 	@Override
 	public void move(TaskTree node, TaskTree newParent) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
@@ -381,4 +393,12 @@ public class TaskService implements TreeDao<TaskTree>{
 			this.targetRight = targetLeft + 1; 
 		}
 	}
+
+//	public void removeByName(String name) {
+//		treeRepo.deleteByName(name);
+//	}
+//	public void removeByRange(int left, int right) {
+//		treeRepo.deleteByRange(left, right);
+//	}
+
 }
