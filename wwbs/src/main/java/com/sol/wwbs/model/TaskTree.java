@@ -19,7 +19,7 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private int id = -1;
 	
 	private String name;
 	
@@ -29,12 +29,12 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	@Column(name="rgt")
 	private int right;
 
-	@OneToMany(mappedBy = "tree")
+	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Task> tasks;
 	
 	@ManyToOne(targetEntity = TaskTree.class)
-	@JoinColumn(name="root")
-	private NestedSetsTreeNode root;
+	@JoinColumn(name="root", nullable = true, updatable = true)
+	private TaskTree root;
 
 	
 	public TaskTree() {
@@ -48,6 +48,10 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 		this.id = id;
 	}
 
+	public int numberOfNodesInSubTree(){
+		return (this.right - this.left)/2 + 1;
+	}
+	
 	@Override
 	public int getLeft() {
 		return this.left;	
@@ -75,7 +79,7 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 
 	@Override
 	public void setRoot(NestedSetsTreeNode root) {
-		this.root = root;
+		this.root = (TaskTree)root;
 	}
 
 	@Override
@@ -113,12 +117,20 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
 		
+		buffer.append("[").append(this.root.getId()).append("]");
 		buffer.append("[").append(this.id).append("]");
 		buffer.append("[").append(this.name).append("]");
-		buffer.append(":").append(this.left).append(",").append(this.right).append(",");
-		buffer.append(this.root);
+		buffer.append(":").append(this.left).append(",").append(this.right);
 		
 		return buffer.toString();
+	}
+
+	public boolean isRoot() {
+		return this.getId() == root.getId();
+	}
+
+	public boolean isPersistent() {
+		return this.id > 0;
 	}
 
 }

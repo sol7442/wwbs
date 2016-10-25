@@ -30,7 +30,7 @@ public interface TreeDao<N extends TreeNode>
 	
 	
 	/** @return true if passed entity is already persistent, i.e. its getId() is not null. */
-	boolean isPersistent(N entity);
+	//boolean isPersistent(N entity);
 
 	/** @return the object by identity (primary key) from database. */
 	N find(Serializable id);

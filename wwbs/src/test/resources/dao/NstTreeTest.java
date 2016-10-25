@@ -1,6 +1,8 @@
 package dao;
 
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +35,56 @@ public class NstTreeTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testAddTask(){
 		try {
 			TaskTree root = taskService.getRoot("Admin");
 			TaskTree sub = new TaskTree();
-			sub.setName("Main");
+			sub.setName("Main5");
+			
+			sub = taskService.addChild(root, sub);
 			
 			System.out.println(root);
+			System.out.println(sub);
 			
-			taskService.addChild(root, sub);
 		} catch (UniqueConstraintViolationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//@Test
+	public void testGetChildTask(){
+		try {
+			TaskTree root = taskService.getRoot("Admin");
+			List<TaskTree> list = taskService.getChildren(root);
+			
+			for(TaskTree tree : list){
+				System.out.println(tree);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testRemoveTask(){
+		try {
+			TaskTree root = taskService.getRoot("Admin");
+			List<TaskTree> list = taskService.getChildren(root);
+			for(TaskTree tree : list){
+				System.out.println(tree);
+			}
+			
+			TaskTree del_task = list.get(list.size() - 1);
+			taskService.remove(del_task);
+		
+			list = taskService.getChildren(root);
+			for(TaskTree tree : list){
+				System.out.println(tree);
+			}
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

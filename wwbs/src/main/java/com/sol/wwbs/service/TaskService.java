@@ -1,6 +1,8 @@
 package com.sol.wwbs.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.sol.wwbs.model.TaskTree;
 import com.sol.wwbs.repository.TaskRepository;
 import com.sol.wwbs.repository.TaskTreeRepository;
+import com.sol.wwbs.util.tree.NestedSetsTreeNode;
 import com.sol.wwbs.util.tree.TreeActionLocation;
 import com.sol.wwbs.util.tree.TreeDao;
 import com.sol.wwbs.util.tree.UniqueConstraintViolationException;
@@ -17,7 +20,7 @@ import com.sol.wwbs.util.tree.UniqueTreeConstraint;
 import com.sol.wwbs.util.tree.TreeActionLocation.ActionType;
 import com.sol.wwbs.util.tree.TreeActionLocation.RelatedNodeType;
 
-import fri.util.database.jpa.tree.nestedsets.NestedSetsTreeDao.Location;
+
 
 
 
@@ -30,10 +33,10 @@ public class TaskService implements TreeDao<TaskTree>{
 	
 	private static final int ROOT_LEFT  = 1;
 	private static final int ROOT_RIGHT = 2;
-	@Override
-	public boolean isPersistent(TaskTree entity) {
-		return entity.getId() == null;
-	}
+//	@Override
+//	public boolean isPersistent(TaskTree entity) {
+//		return false;//entity.getId() == null;
+//	}
 	@Override
 	public TaskTree find(Serializable id) {
 		// TODO Auto-generated method stub
@@ -87,8 +90,29 @@ public class TaskService implements TreeDao<TaskTree>{
 		return null;
 	}
 	@Override
-	public List<TaskTree> findDirectChildren(List<TaskTree> treeCacheable) {
-		// TODO Auto-generated method stub
+	public List<TaskTree> findDirectChildren(List<TaskTree> subNodes) {
+//		final int size = subNodes.size();
+//		if (size <= 1){	
+//			return Collections.unmodifiableList(children);
+//		}
+//		
+//		NestedSetsTreeNode parent = subNodes.get(0);
+//		subNodes = subNodes.subList(1, size);
+//		
+//		int nextChildLeft = parent.getLeft() + 1;	// this is 'left' of first child
+//		int currentChildRight = subNodes.get(0).getRight();
+//		int i = 0;
+//		for (NestedSetsTreeNode node : subNodes)	{
+//			if (isNextChild(nextChildLeft, node, currentChildRight, subNodes, i))	{
+//				if (isValidFilterChild(node))	{
+//					children.add(node);
+//					currentChildRight = node.getRight();
+//				}
+//				nextChildLeft = node.getRight() + 1;	// calculate 'left' of next child
+//			}
+//			i++;
+//		}
+		
 		return null;
 	}
 	@Override
@@ -102,7 +126,14 @@ public class TaskService implements TreeDao<TaskTree>{
 	}
 	@Override
 	public List<TaskTree> getChildren(TaskTree parent) {
-		// TODO Auto-generated method stub
+		return treeRepo.getChildren((TaskTree)parent.getRoot(),parent.getLeft(),parent.getRight());
+		
+		
+//		List<TaskTree> subTree = getSubTreeDepthFirst(parent);
+//		return findDirectChildren(subTree);
+	}
+	private List<TaskTree> getSubTreeDepthFirst(TaskTree parent) {
+		//select * from _tree t where t.root = 1 and t.lft >=1 and t.rgt <=2 order by t.lft;
 		return null;
 	}
 	@Override
@@ -146,30 +177,34 @@ public class TaskService implements TreeDao<TaskTree>{
 	@Override
 	public TaskTree addChildAt(TaskTree parent, TaskTree child, int position)
 			throws UniqueConstraintViolationException {
-		Location location = location(parent, position, null, false);
+		Location location = location(parent, position, null, ActionType.INSERT);
 		
 		return addChild(location,child);
 	}
 	private TaskTree addChild(Location location, TaskTree child) {
-		if(isPersistent(child)){
+		if(child.isPersistent()){
 			throw new IllegalArgumentException("Node is already persistent, can not be added as child: "+child);
 		}
-		final TaskTree root = location.root;
+		
+		final TaskTree root = (TaskTree)location.root;
 		child.setRoot(root);
 		child.setLeft(location.targetLeft);
 		child.setRight(location.targetRight);
 		
 		//checkUniqueness
-		createGap(location.targetLeft, root, 1);
+		treeRepo.updateAddLeftGap(root,2,location.targetLeft);
+		treeRepo.updateAddRightGap(root,2, location.targetLeft);
 		
-		return null;
+		treeRepo.flush();
+		
+		return treeRepo.save(child);
 	}
-	private void createGap(int gapLeft, TaskTree root, int nodesCount) {
-		
-		treeRepo.updateAddLeftGap(nodesCount*2, root,gapLeft);
-		
-	//	gap("+", gapLeft, gapLeft, root, nodesCount);
-	}
+//	private void createGap(int gapLeft, TaskTree root, int nodesCount) {
+//		
+//		treeRepo.updateAddLeftGap(nodesCount*2, root,gapLeft);
+//		
+//	//	gap("+", gapLeft, gapLeft, root, nodesCount);
+//	}
 //	private void gap(String string, int gapLeft, int gapLeft2, TaskTree root, int nodesCount) {
 //		// TODO Auto-generated method stub
 //		
@@ -181,8 +216,27 @@ public class TaskService implements TreeDao<TaskTree>{
 	}
 	@Override
 	public void remove(TaskTree node) {
-		// TODO Auto-generated method stub
+		if(node == null || !node.isPersistent()){
+			throw new IllegalArgumentException("Node is null or not persistent: "+node);
+		}
 		
+		treeRepo.flush();
+		//if(node.isRoot()){
+		treeRepo.updateRootNull(node);//, node.getLeft(),node.getRight());
+		//}
+		
+		final TaskTree root = (TaskTree)node.getRoot();
+		
+		System.out.println(node.toString() + ":" +node.getLeft() + "," + node.getRight());
+		
+		treeRepo.delete(node,node.getLeft(),node.getRight());
+		
+		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
+		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
+		
+		//treeRepo.delete(node);
+		
+		//treeRepo.flush();
 	}
 	@Override
 	public void move(TaskTree node, TaskTree newParent) throws UniqueConstraintViolationException {
@@ -282,24 +336,46 @@ public class TaskService implements TreeDao<TaskTree>{
 //		return null;
 //	}
 //	
-	private Location location(TaskTree parent, int position, TaskTree moveNode, ActionType type){
+	private Location location(TaskTree parent, int position, TaskTree moveNode, ActionType actionType){
 		
 		if(isLeaf(parent)){
-			return new Location(parent.getRoot(), RelatedNodeType.PARENT, parent, type, parent.getLeft() + 1);
+			return new Location(parent.getRoot(), RelatedNodeType.PARENT, parent, actionType, parent.getLeft() + 1);
 		}
 		
-//		if (position <= UNDEFINED_POSITION){
-//			return new Location(parent.getTopLevel(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
-//		}
+		if (position <= UNDEFINED_POSITION){
+			return new Location(parent.getRoot(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
+		}
 		
+		 
+		List<TaskTree> children = getChildListForInsertion(parent);
+		if (position >= children.size()){
+			return new Location(parent.getRoot(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
+		}
 		
-		return location;
+		TaskTree sibling = getSiblingNode(children,moveNode,position);
+		return new Location(parent, RelatedNodeType.SIBLING, sibling, actionType, sibling.getLeft());
 	}
 	
-	private static class Location extends TreeActionLocation<TaskTree>{
+	private List<TaskTree> getChildListForInsertion(TaskTree parent) {
+		return getChildren(parent);
+	}
+	private TaskTree getSiblingNode(List<TaskTree> children,TaskTree moveNode, int position) {
+		TaskTree sibling = null;
+		if (moveNode != null)	{
+			int movingChildPosition = children.indexOf(moveNode);
+			if (movingChildPosition >= 0 && movingChildPosition < position)	{
+				if (position + 1 < children.size())	{
+					sibling = children.get(position + 1);
+				}
+			}
+		}
+		return sibling;
+	}
+
+	private static class Location extends TreeActionLocation<NestedSetsTreeNode>{
 		public final int targetLeft;
 		public final int targetRight;
-		public Location(TaskTree root, RelatedNodeType relatedNodeType, TaskTree relatedNode, ActionType actionType, int targetLeft) {
+		public Location(NestedSetsTreeNode root, RelatedNodeType relatedNodeType, NestedSetsTreeNode relatedNode, ActionType actionType, int targetLeft) {
 			super(root, relatedNodeType, relatedNode, actionType);
 			this.targetLeft  = targetLeft;
 			this.targetRight = targetLeft + 1; 
