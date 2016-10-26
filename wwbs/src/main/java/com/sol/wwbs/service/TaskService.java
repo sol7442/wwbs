@@ -9,9 +9,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sol.wwbs.model.TaskTree;
+import com.sol.wwbs.model.NamedNearSetTree;
 import com.sol.wwbs.repository.TaskRepository;
-import com.sol.wwbs.repository.TaskTreeRepository;
+import com.sol.wwbs.repository.NamedNearSetTreeRepository;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
 import com.sol.wwbs.util.tree.TreeActionLocation;
 import com.sol.wwbs.util.tree.TreeDao;
@@ -26,9 +26,9 @@ import com.sol.wwbs.util.tree.TreeActionLocation.RelatedNodeType;
 
 
 @Service
-public class TaskService implements TreeDao<TaskTree>{
+public class TaskService implements TreeDao<NamedNearSetTree>{
 	@Autowired
-	private TaskTreeRepository treeRepo;
+	private NamedNearSetTreeRepository treeRepo;
 	private TaskRepository taskRepo;
 	
 	private static final int ROOT_LEFT  = 1;
@@ -38,34 +38,34 @@ public class TaskService implements TreeDao<TaskTree>{
 //		return false;//entity.getId() == null;
 //	}
 	@Override
-	public TaskTree find(Serializable id) {
+	public NamedNearSetTree find(Serializable id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void update(TaskTree entity) throws UniqueConstraintViolationException {
+	public void update(NamedNearSetTree entity) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public boolean isRoot(TaskTree entity) {
+	public boolean isRoot(NamedNearSetTree entity) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
-	public TaskTree createRoot(TaskTree root) throws UniqueConstraintViolationException {
+	public NamedNearSetTree createRoot(NamedNearSetTree root) throws UniqueConstraintViolationException {
 		root.setLeft(ROOT_LEFT);
 		root.setRight(ROOT_RIGHT);
 		
 		return treeRepo.save(root);
 	}
 	@Override
-	public int size(TaskTree tree) {
+	public int size(NamedNearSetTree tree) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 	@Override
-	public List<TaskTree> getRoots() {
+	public List<NamedNearSetTree> getRoots() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -75,22 +75,22 @@ public class TaskService implements TreeDao<TaskTree>{
 		
 	}
 	@Override
-	public List<TaskTree> getTree(TaskTree parent) {
+	public List<NamedNearSetTree> getTree(NamedNearSetTree parent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public List<TaskTree> getTreeCacheable(TaskTree parent) {
+	public List<NamedNearSetTree> getTreeCacheable(NamedNearSetTree parent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public List<TaskTree> findSubTree(TaskTree parent, List<TaskTree> treeCacheable) {
+	public List<NamedNearSetTree> findSubTree(NamedNearSetTree parent, List<NamedNearSetTree> treeCacheable) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public List<TaskTree> findDirectChildren(List<TaskTree> subNodes) {
+	public List<NamedNearSetTree> findDirectChildren(List<NamedNearSetTree> subNodes) {
 //		final int size = subNodes.size();
 //		if (size <= 1){	
 //			return Collections.unmodifiableList(children);
@@ -115,79 +115,80 @@ public class TaskService implements TreeDao<TaskTree>{
 		
 		return null;
 	}
+//	@Override
+//	public boolean isLeaf(NamedNearSetTree node) {
+//		return node.getLeft() + 1 == node.getRight();
+//	}
 	@Override
-	public boolean isLeaf(TaskTree node) {
-		return node.getLeft() + 1 == node.getRight();
-	}
-	@Override
-	public int getChildCount(TaskTree parent) {
+	public int getChildCount(NamedNearSetTree parent) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 	@Override
-	public List<TaskTree> getChildren(TaskTree parent) {
-		return treeRepo.getChildren((TaskTree)parent.getRoot(),parent.getLeft(),parent.getRight());
+	public List<NamedNearSetTree> getChildren(NamedNearSetTree parent) {
+		return treeRepo.getChildren((NamedNearSetTree)parent.getRoot(),parent.getLeft(),parent.getRight());
 		
 		
 //		List<TaskTree> subTree = getSubTreeDepthFirst(parent);
 //		return findDirectChildren(subTree);
 	}
-	private List<TaskTree> getSubTreeDepthFirst(TaskTree parent) {
+	private List<NamedNearSetTree> getSubTreeDepthFirst(NamedNearSetTree parent) {
 		//select * from _tree t where t.root = 1 and t.lft >=1 and t.rgt <=2 order by t.lft;
 		return null;
 	}
 	@Override
-	public TaskTree getRoot(TaskTree node) {
+	public NamedNearSetTree getRoot(NamedNearSetTree node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public TaskTree getRoot(String name) {
+	public NamedNearSetTree getRoot(String name) {
 		return treeRepo.findByName(name);
 	}
 	
 	@Override
-	public TaskTree getParent(TaskTree node) {
+	public NamedNearSetTree getParent(NamedNearSetTree node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public List<TaskTree> getPath(TaskTree node) {
+	public List<NamedNearSetTree> getPath(NamedNearSetTree node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public int getLevel(TaskTree node) {
+	public int getLevel(NamedNearSetTree node) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 	@Override
-	public boolean isEqualToOrChildOf(TaskTree child, TaskTree parent) {
+	public boolean isEqualToOrChildOf(NamedNearSetTree child, NamedNearSetTree parent) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
-	public boolean isChildOf(TaskTree child, TaskTree parent) {
+	public boolean isChildOf(NamedNearSetTree child, NamedNearSetTree parent) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
-	public TaskTree addChild(TaskTree parent, TaskTree child) throws UniqueConstraintViolationException {
+	public NamedNearSetTree addChild(NamedNearSetTree parent, NamedNearSetTree child) throws UniqueConstraintViolationException {
 		return addChildAt(parent, child, UNDEFINED_POSITION);
 	}
 	@Override
-	public TaskTree addChildAt(TaskTree parent, TaskTree child, int position)
+	public NamedNearSetTree addChildAt(NamedNearSetTree parent, NamedNearSetTree child, int position)
 			throws UniqueConstraintViolationException {
 		Location location = location(parent, position, null, ActionType.INSERT);
 		
-		return addChild(location,child);
+		return addChild(parent,child,location);
 	}
-	private TaskTree addChild(Location location, TaskTree child) {
+	private NamedNearSetTree addChild(NamedNearSetTree parent, NamedNearSetTree child,Location location) {
 		if(child.isPersistent()){
 			throw new IllegalArgumentException("Node is already persistent, can not be added as child: "+child);
 		}
 		
-		final TaskTree root = (TaskTree)location.root;
+		final NamedNearSetTree root = (NamedNearSetTree)location.root;
 		child.setRoot(root);
+		child.setDepth(parent.getDepth() + 1);
 		child.setLeft(location.targetLeft);
 		child.setRight(location.targetRight);
 		
@@ -210,17 +211,17 @@ public class TaskService implements TreeDao<TaskTree>{
 //		
 //	}
 	@Override
-	public TaskTree addChildBefore(TaskTree sibling, TaskTree child) throws UniqueConstraintViolationException {
+	public NamedNearSetTree addChildBefore(NamedNearSetTree sibling, NamedNearSetTree child) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void remove(TaskTree node) {
+	public void remove(NamedNearSetTree node) {
 		if(node == null || !node.isPersistent()){
 			throw new IllegalArgumentException("Node is null or not persistent: "+node);
 		}
 
-		final TaskTree root = (TaskTree)node.getRoot();
+		final NamedNearSetTree root = (NamedNearSetTree)node.getRoot();
 		
 		if(node.isRoot()){
 			treeRepo.updateRootNull(root, node.getLeft(),node.getRight());
@@ -251,61 +252,61 @@ public class TaskService implements TreeDao<TaskTree>{
 //	}
 	
 	@Override
-	public void move(TaskTree node, TaskTree newParent) throws UniqueConstraintViolationException {
+	public void move(NamedNearSetTree node, NamedNearSetTree newParent) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void moveTo(TaskTree node, TaskTree parent, int position) throws UniqueConstraintViolationException {
+	public void moveTo(NamedNearSetTree node, NamedNearSetTree parent, int position) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void moveBefore(TaskTree node, TaskTree sibling) throws UniqueConstraintViolationException {
+	public void moveBefore(NamedNearSetTree node, NamedNearSetTree sibling) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void moveToBeRoot(TaskTree child) throws UniqueConstraintViolationException {
+	public void moveToBeRoot(NamedNearSetTree child) throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public TaskTree copy(TaskTree node, TaskTree parent, TaskTree copiedNodeTemplate)
+	public NamedNearSetTree copy(NamedNearSetTree node, NamedNearSetTree parent, NamedNearSetTree copiedNodeTemplate)
 			throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public TaskTree copyTo(TaskTree node, TaskTree parent, int position, TaskTree copiedNodeTemplate)
+	public NamedNearSetTree copyTo(NamedNearSetTree node, NamedNearSetTree parent, int position, NamedNearSetTree copiedNodeTemplate)
 			throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public TaskTree copyBefore(TaskTree node, TaskTree sibling, TaskTree copiedNodeTemplate)
+	public NamedNearSetTree copyBefore(NamedNearSetTree node, NamedNearSetTree sibling, NamedNearSetTree copiedNodeTemplate)
 			throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public TaskTree copyToBeRoot(TaskTree child, TaskTree copiedNodeTemplate)
+	public NamedNearSetTree copyToBeRoot(NamedNearSetTree child, NamedNearSetTree copiedNodeTemplate)
 			throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void setCopiedNodeRenamer(com.sol.wwbs.util.tree.TreeDao.CopiedNodeRenamer<TaskTree> copiedNodeRenamer) {
+	public void setCopiedNodeRenamer(com.sol.wwbs.util.tree.TreeDao.CopiedNodeRenamer<NamedNearSetTree> copiedNodeRenamer) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public List<TaskTree> find(TaskTree parent, Map<String, Object> criteria) {
+	public List<NamedNearSetTree> find(NamedNearSetTree parent, Map<String, Object> criteria) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void setUniqueTreeConstraint(UniqueTreeConstraint<TaskTree> uniqueTreeConstraint) {
+	public void setUniqueTreeConstraint(UniqueTreeConstraint<NamedNearSetTree> uniqueTreeConstraint) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -315,7 +316,7 @@ public class TaskService implements TreeDao<TaskTree>{
 		
 	}
 	@Override
-	public void checkUniqueConstraint(TaskTree cloneOfExistingNodeWithNewValues, TaskTree root, TaskTree originalNode)
+	public void checkUniqueConstraint(NamedNearSetTree cloneOfExistingNodeWithNewValues, NamedNearSetTree root, NamedNearSetTree originalNode)
 			throws UniqueConstraintViolationException {
 		// TODO Auto-generated method stub
 		
@@ -348,9 +349,9 @@ public class TaskService implements TreeDao<TaskTree>{
 //		return null;
 //	}
 //	
-	private Location location(TaskTree parent, int position, TaskTree moveNode, ActionType actionType){
+	private Location location(NamedNearSetTree parent, int position, NamedNearSetTree moveNode, ActionType actionType){
 		
-		if(isLeaf(parent)){
+		if(parent.isLeaf()){
 			return new Location(parent.getRoot(), RelatedNodeType.PARENT, parent, actionType, parent.getLeft() + 1);
 		}
 		
@@ -359,20 +360,20 @@ public class TaskService implements TreeDao<TaskTree>{
 		}
 		
 		 
-		List<TaskTree> children = getChildListForInsertion(parent);
+		List<NamedNearSetTree> children = getChildListForInsertion(parent);
 		if (position >= children.size()){
 			return new Location(parent.getRoot(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
 		}
 		
-		TaskTree sibling = getSiblingNode(children,moveNode,position);
+		NamedNearSetTree sibling = getSiblingNode(children,moveNode,position);
 		return new Location(parent, RelatedNodeType.SIBLING, sibling, actionType, sibling.getLeft());
 	}
 	
-	private List<TaskTree> getChildListForInsertion(TaskTree parent) {
+	private List<NamedNearSetTree> getChildListForInsertion(NamedNearSetTree parent) {
 		return getChildren(parent);
 	}
-	private TaskTree getSiblingNode(List<TaskTree> children,TaskTree moveNode, int position) {
-		TaskTree sibling = null;
+	private NamedNearSetTree getSiblingNode(List<NamedNearSetTree> children,NamedNearSetTree moveNode, int position) {
+		NamedNearSetTree sibling = null;
 		if (moveNode != null)	{
 			int movingChildPosition = children.indexOf(moveNode);
 			if (movingChildPosition >= 0 && movingChildPosition < position)	{
@@ -392,6 +393,10 @@ public class TaskService implements TreeDao<TaskTree>{
 			this.targetLeft  = targetLeft;
 			this.targetRight = targetLeft + 1; 
 		}
+	}
+
+	public List<NamedNearSetTree> getTree(String name) {
+		return treeRepo.findByTreeName(name);
 	}
 
 //	public void removeByName(String name) {

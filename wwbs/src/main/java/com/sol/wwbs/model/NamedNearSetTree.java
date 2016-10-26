@@ -14,7 +14,7 @@ import com.sol.wwbs.util.tree.NestedSetsTreeNode;
  */
 @Entity
 @Table(name="_tree")
-public class TaskTree implements Serializable, NestedSetsTreeNode {
+public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -28,16 +28,19 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	
 	@Column(name="rgt")
 	private int right;
-
-	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Task> tasks;
 	
-	@ManyToOne(targetEntity = TaskTree.class)//, optional=true, fetch=FetchType.LAZY, cascade = CascadeType.REFRESH  )
+	@Column(name="depth")
+	private int depth;
+
+//	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+//	private List<Task> tasks;
+	
+	@ManyToOne(targetEntity = NamedNearSetTree.class)//, optional=true, fetch=FetchType.LAZY, cascade = CascadeType.REFRESH  )
 	@JoinColumn(name="root", nullable = true, updatable = true)
-	private TaskTree root;
+	private NamedNearSetTree root;
 
 	
-	public TaskTree() {
+	public NamedNearSetTree() {
 	}
 
 	public int getTaskId() {
@@ -50,6 +53,13 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 
 	public int numberOfNodesInSubTree(){
 		return (this.right - this.left)/2 + 1;
+	}
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 	
 	@Override
@@ -79,12 +89,12 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 
 	@Override
 	public void setRoot(NestedSetsTreeNode root) {
-		this.root = (TaskTree)root;
+		this.root = (NamedNearSetTree)root;
 	}
 
 	@Override
 	public NestedSetsTreeNode clone() {
-		TaskTree clone = new TaskTree();
+		NamedNearSetTree clone = new NamedNearSetTree();
 		clone.setRoot(getRoot());
 		return clone;
 	}
@@ -103,16 +113,16 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 	}
 	
 
-	public List<Task> getTasks() {
-		return tasks;
-	}
-
-	public void addTasK(Task task) {
-		if(this.tasks == null){
-			this.tasks = new ArrayList<Task>();
-		}
-		this.tasks.add(task);
-	}
+//	public List<Task> getTasks() {
+//		return tasks;
+//	}
+//
+//	public void addTasK(Task task) {
+//		if(this.tasks == null){
+//			this.tasks = new ArrayList<Task>();
+//		}
+//		this.tasks.add(task);
+//	}
 	
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
@@ -125,12 +135,18 @@ public class TaskTree implements Serializable, NestedSetsTreeNode {
 		return buffer.toString();
 	}
 
+	@Override
 	public boolean isRoot() {
 		return this.getId() == root.getId();
 	}
 
+	@Override
 	public boolean isPersistent() {
 		return this.id > 0;
+	}
+	@Override
+	public boolean isLeaf() {
+		return this.left + 1 == this.right;
 	}
 
 }

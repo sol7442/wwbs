@@ -100,8 +100,8 @@ public interface TreeDao<N extends TreeNode>
 	 */
 	List<N> findDirectChildren(List<N> treeCacheable);
 
-	/** @return true when given node has no children, i.e. is not a container-node. */
-	boolean isLeaf(N node);
+//	/** @return true when given node has no children, i.e. is not a container-node. */
+//	boolean isLeaf(N node);
 
 	/** @return the number of direct children of given parent node. */
 	int getChildCount(N parent);

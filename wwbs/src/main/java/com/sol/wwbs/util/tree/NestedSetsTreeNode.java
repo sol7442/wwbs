@@ -68,6 +68,10 @@ public interface NestedSetsTreeNode extends TreeNode
 	 */
 	void setRoot(NestedSetsTreeNode root);
 	
+	
+	public boolean isRoot();
+	public boolean isPersistent();
+	public boolean isLeaf();
 	/**
 	 * For copy and unique constraint checking this is required.
 	 * @return a clone of this node, not including the "id" property (which is set by the JPA layer).

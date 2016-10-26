@@ -17,6 +17,10 @@ import javax.persistence.Table;
 public class Task implements Serializable{
 	private static final long serialVersionUID = 1L;
 
+	public enum TYPE{
+		Control,View,Model,Architechtrue,Envementment,Document,Research,Support,Education
+	}
+	
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -25,18 +29,18 @@ public class Task implements Serializable{
 	private String name;
 	
 	private String desc;
+//	
+//	@ManyToOne(fetch=FetchType.LAZY)
+//	@JoinColumn(name="treeId")
+//	private TaskTree tree;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="treeId")
-	private TaskTree tree;
 	
-	
-	public void setTaskTree(TaskTree tree){
-		this.tree = tree;
-	}
-	public TaskTree getTaskTree(){
-		return this.tree;
-	}
+//	public void setTaskTree(TaskTree tree){
+//		this.tree = tree;
+//	}
+//	public TaskTree getTaskTree(){
+//		return this.tree;
+//	}
 	
 	public String getName() {
 		return name;
