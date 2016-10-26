@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sol.wwbs.model.NamedNearSetTree;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
 
-public interface NamedNearSetTreeRepository extends JpaRepository<NamedNearSetTree,Integer> {
+public interface NNstRepository extends JpaRepository<NamedNearSetTree,Integer> {
 	@Query("select t from NamedNearSetTree t where t.root is null")
 	List<NamedNearSetTree> findRoots();
 	
 	@Transactional
 	@Modifying //update _tree t set t.lft = t.lft + 2 where t.root = 1 and t.lft > 2
-    @Query("update NamedNearSetTree t set t.left = t.left + ?2 where t.root = ?1 and t.left > ?3")
+    @Query("update NamedNearSetTree t set t.left = t.left + ?2 where t.root = ?1 and t.left >= ?3")
     void updateAddLeftGap(NamedNearSetTree root,int range, int left);
 	
 	@Transactional
@@ -29,12 +29,12 @@ public interface NamedNearSetTreeRepository extends JpaRepository<NamedNearSetTr
 	
 	@Transactional
 	@Modifying //update _tree t set t.rgt = t.rgt + 2 where t.root = 1 and t.rgt > 3
-    @Query("update NamedNearSetTree t set t.left = t.left - ?2 where t.root = ?1 and t.left > ?3")
+    @Query("update NamedNearSetTree t set t.left = t.left - ?2 where t.root = ?1 and t.left >= ?3")
 	void updateDelLeftGap(NamedNearSetTree root, int range, int left);
 	
 	@Transactional
 	@Modifying //update _tree t set t.rgt = t.rgt + 2 where t.root = 1 and t.rgt > 3
-    @Query("update NamedNearSetTree t set t.right = t.right - ?2 where t.root = ?1 and t.right > ?3")
+    @Query("update NamedNearSetTree t set t.right = t.right - ?2 where t.root = ?1 and t.right >= ?3")
     void updateDelRightGap(NamedNearSetTree root,int range, int right);
 	
 	

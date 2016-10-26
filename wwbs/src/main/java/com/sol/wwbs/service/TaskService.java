@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sol.wwbs.model.NamedNearSetTree;
-import com.sol.wwbs.repository.TaskRepository;
-import com.sol.wwbs.repository.NamedNearSetTreeRepository;
+import com.sol.wwbs.repository.WbsTaskRepository;
+import com.sol.wwbs.repository.NNstRepository;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
 import com.sol.wwbs.util.tree.TreeActionLocation;
 import com.sol.wwbs.util.tree.TreeDao;
@@ -21,15 +21,11 @@ import com.sol.wwbs.util.tree.TreeActionLocation.ActionType;
 import com.sol.wwbs.util.tree.TreeActionLocation.RelatedNodeType;
 
 
-
-
-
-
 @Service
 public class TaskService implements TreeDao<NamedNearSetTree>{
 	@Autowired
-	private NamedNearSetTreeRepository treeRepo;
-	private TaskRepository taskRepo;
+	private NNstRepository treeRepo;
+	private WbsTaskRepository taskRepo;
 	
 	private static final int ROOT_LEFT  = 1;
 	private static final int ROOT_RIGHT = 2;
@@ -179,18 +175,18 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 			throws UniqueConstraintViolationException {
 		Location location = location(parent, position, null, ActionType.INSERT);
 		
-		return addChild(parent,child,location);
+		return addChild(child,location,parent.getDepth() + 1);
 	}
-	private NamedNearSetTree addChild(NamedNearSetTree parent, NamedNearSetTree child,Location location) {
+	private NamedNearSetTree addChild(NamedNearSetTree child,Location location,int depth) {
 		if(child.isPersistent()){
 			throw new IllegalArgumentException("Node is already persistent, can not be added as child: "+child);
 		}
 		
 		final NamedNearSetTree root = (NamedNearSetTree)location.root;
 		child.setRoot(root);
-		child.setDepth(parent.getDepth() + 1);
+		child.setDepth(depth);
 		child.setLeft(location.targetLeft);
-		child.setRight(location.targetRight);
+		child.setRight(location.targetLeft + 1);
 		
 		//checkUniqueness
 		treeRepo.updateAddLeftGap(root,2,location.targetLeft);
@@ -200,20 +196,11 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 		return treeRepo.save(child);
 	}
-//	private void createGap(int gapLeft, TaskTree root, int nodesCount) {
-//		
-//		treeRepo.updateAddLeftGap(nodesCount*2, root,gapLeft);
-//		
-//	//	gap("+", gapLeft, gapLeft, root, nodesCount);
-//	}
-//	private void gap(String string, int gapLeft, int gapLeft2, TaskTree root, int nodesCount) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	
 	@Override
 	public NamedNearSetTree addChildBefore(NamedNearSetTree sibling, NamedNearSetTree child) throws UniqueConstraintViolationException {
-		// TODO Auto-generated method stub
-		return null;
+		Location location = new Location(sibling.getRoot(), RelatedNodeType.SIBLING, sibling, ActionType.INSERT, sibling.getLeft());
+		return addChild(child,location,sibling.getDepth());
 	}
 	@Override
 	public void remove(NamedNearSetTree node) {
@@ -233,10 +220,6 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
 		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
-		
-		//treeRepo.delete(node);
-		
-		//treeRepo.flush();
 	}
 	
 
@@ -322,34 +305,7 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 	}
 	
-//	public TaskTree createTaskTree(TaskTree tree){
-//		return treeRepo.save(tree);
-//	}
-////	public TaskTree createRoot(TaskTree root){
-////				
-////		root.setLeft(ROOT_LEFT);
-////		root.setRight(ROOT_RIGHT);
-////		
-////		//Location location = new Location(null, TreeActionLocation.RelatedNodeType.PARENT, null, TreeActionLocation.ActionType.INSERT, ROOT_LEFT);
-////		//checkUniqueness(Arrays.asList(new NestedSetsTreeNode [] { root }), location);
-////		
-////		return treeRepo.save(root);
-////		
-////	}
-//	
-//	public TaskTree addTask(TaskTree root, TaskTree tree){
-//		Location location = null;//new Location(root, relatedNodeType, relatedNode, null, targetLeft);
-//		return addTask(location, tree);
-//	}
-//	
-//	private TaskTree addTask(Location location, TaskTree tree){
-//		
-//		
-//		
-//		return null;
-//	}
-//	
-	private Location location(NamedNearSetTree parent, int position, NamedNearSetTree moveNode, ActionType actionType){
+	private Location location(NamedNearSetTree parent, int position, NamedNearSetTree node, ActionType actionType){
 		
 		if(parent.isLeaf()){
 			return new Location(parent.getRoot(), RelatedNodeType.PARENT, parent, actionType, parent.getLeft() + 1);
@@ -365,8 +321,8 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 			return new Location(parent.getRoot(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
 		}
 		
-		NamedNearSetTree sibling = getSiblingNode(children,moveNode,position);
-		return new Location(parent, RelatedNodeType.SIBLING, sibling, actionType, sibling.getLeft());
+		NamedNearSetTree sibling = getSiblingNode(children,node,position);
+		return new Location(parent.getRoot(), RelatedNodeType.SIBLING, sibling, actionType, sibling.getLeft());
 	}
 	
 	private List<NamedNearSetTree> getChildListForInsertion(NamedNearSetTree parent) {
@@ -387,11 +343,9 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 
 	private static class Location extends TreeActionLocation<NestedSetsTreeNode>{
 		public final int targetLeft;
-		public final int targetRight;
 		public Location(NestedSetsTreeNode root, RelatedNodeType relatedNodeType, NestedSetsTreeNode relatedNode, ActionType actionType, int targetLeft) {
 			super(root, relatedNodeType, relatedNode, actionType);
 			this.targetLeft  = targetLeft;
-			this.targetRight = targetLeft + 1; 
 		}
 	}
 

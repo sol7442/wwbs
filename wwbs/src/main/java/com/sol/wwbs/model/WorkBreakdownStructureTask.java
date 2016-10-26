@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="_task")
-public class Task implements Serializable{
+public class WorkBreakdownStructureTask implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	public enum TYPE{
