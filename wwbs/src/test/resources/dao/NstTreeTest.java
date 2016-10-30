@@ -161,6 +161,7 @@ public class NstTreeTest {
 		try {
 			NamedNearSetTree taget	 = targets1.get(0);
 			NamedNearSetTree before  = targets2.get(0);
+			before.getp
 			
 			taskService.move(before, taget);
 			
