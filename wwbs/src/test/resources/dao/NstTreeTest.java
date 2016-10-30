@@ -35,7 +35,7 @@ public class NstTreeTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testAddTask(){
 		try {
 			NamedNearSetTree root = taskService.getRoot("Admin");
@@ -73,7 +73,7 @@ public class NstTreeTest {
 	public void testAddNearTask(){
 		try {
 			
-			List<NamedNearSetTree> sub_tree_list = taskService.getTree("Sub020");
+			List<NamedNearSetTree> sub_tree_list = taskService.findByName("Sub020");
 			NamedNearSetTree sub_tree0 = sub_tree_list.get(0);
 			NamedNearSetTree new_tree0 = new NamedNearSetTree(); 
 			new_tree0.setName("NearTree");
@@ -93,7 +93,7 @@ public class NstTreeTest {
 			NamedNearSetTree root = taskService.getRoot("Admin");
 			List<NamedNearSetTree> sub_list = taskService.getChildren(root);
 			for(NamedNearSetTree entity : sub_list){
-				List<NamedNearSetTree> sub_tree_list = taskService.getTree(entity.getName());
+				List<NamedNearSetTree> sub_tree_list = taskService.findByName(entity.getName());
 				NamedNearSetTree add_tree = new NamedNearSetTree();
 				add_tree.setName(entity.getName() + entity.getId());
 				NamedNearSetTree sub_tree0 = sub_tree_list.get(0);
@@ -147,6 +147,22 @@ public class NstTreeTest {
 			for(NamedNearSetTree tree : list){
 				System.out.println(tree);
 			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testMoveTask(){
+		testGetChildTask();
+		List<NamedNearSetTree> targets1 = taskService.findByName("Sub525");
+		List<NamedNearSetTree> targets2 = taskService.findByName("Sub626");
+		try {
+			NamedNearSetTree taget	 = targets1.get(0);
+			NamedNearSetTree before  = targets2.get(0);
+			
+			taskService.move(before, taget);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

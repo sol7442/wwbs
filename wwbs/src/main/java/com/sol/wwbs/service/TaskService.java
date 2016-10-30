@@ -235,8 +235,7 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 //	}
 	
 	@Override
-	public void move(NamedNearSetTree node, NamedNearSetTree newParent) throws UniqueConstraintViolationException {
-		// TODO Auto-generated method stub
+	public void move(NamedNearSetTree before, NamedNearSetTree node) throws UniqueConstraintViolationException {
 		
 	}
 	@Override
@@ -349,9 +348,12 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		}
 	}
 
-	public List<NamedNearSetTree> getTree(String name) {
+	public List<NamedNearSetTree> findByName(String name) {
 		return treeRepo.findByTreeName(name);
 	}
+//	public NamedNearSetTree findByName(String string) {
+//		return treeRepo.findByTreeName(name);;
+//	}
 
 //	public void removeByName(String name) {
 //		treeRepo.deleteByName(name);
