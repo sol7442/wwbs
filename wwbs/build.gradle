@@ -53,3 +53,48 @@ uploadArchives {
        }
     }
 }
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+
+def cfg_file = 'src/main/resources/config2.properties'
+
+processResources{
+	Properties def_props = new Properties()
+	def_props.load(project.file('src/main/resources/config-default.properties').newDataInputStream())
+	def_props.each { key, value ->
+    	println key + "=" + value
+  	}
+   
+ 
+ 	Properties tgr_props = new Properties()
+	tgr_props.load(project.file('src/main/resources/config2.properties').newDataInputStream())
+	tgr_props.each { key, val ->
+    	println key + "=" + val
+    	
+    	String val_key = val.substring(2).replaceAll("}","")
+    	
+    	
+    	println key + "=" + val_key
+    	println key + "=" + def_props.getProperty(val_key)
+    	
+    	ant.replace(file: cfg_file, token: val,value: def_props.getProperty(val_key))
+    	//filter(ReplaceTokens,tokens: [val,def_props.getProperty(val_key)])
+  	}   
+   
+   
+   
+   
+	
+}

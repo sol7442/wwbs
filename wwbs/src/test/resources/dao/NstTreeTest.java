@@ -161,9 +161,9 @@ public class NstTreeTest {
 		try {
 			NamedNearSetTree taget	 = targets1.get(0);
 			NamedNearSetTree before  = targets2.get(0);
-			before.getp
+			//before.getp
 			
-			taskService.move(before, taget);
+			//taskService.move(before, taget);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
