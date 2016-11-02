@@ -66,35 +66,32 @@ sourceSets {
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
-
-
-def cfg_file = 'src/main/resources/config2.properties'
-
 processResources{
-	Properties def_props = new Properties()
-	def_props.load(project.file('src/main/resources/config-default.properties').newDataInputStream())
-	def_props.each { key, value ->
-    	println key + "=" + value
-  	}
-   
- 
- 	Properties tgr_props = new Properties()
-	tgr_props.load(project.file('src/main/resources/config2.properties').newDataInputStream())
-	tgr_props.each { key, val ->
-    	println key + "=" + val
-    	
-    	String val_key = val.substring(2).replaceAll("}","")
-    	
-    	
-    	println key + "=" + val_key
-    	println key + "=" + def_props.getProperty(val_key)
-    	
-    	ant.replace(file: cfg_file, token: val,value: def_props.getProperty(val_key))
-    	//filter(ReplaceTokens,tokens: [val,def_props.getProperty(val_key)])
-  	}   
-   
-   
-   
-   
+	Properties jun_prop = new Properties()
+	jun_prop.load(project.file('src/main/resources/config-jun.properties').newDataInputStream())
 	
+	Properties def_prop = new Properties()
+	file(project.file('src/main/resources/config-default.properties')).withInputStream {
+        def_prop.load(it)
+	}
+
+	def_prop.each{key,value ->
+		println key +"=" + value
+		if(jun_prop.getProperty(key) != null){
+			println key +"=>" + jun_prop.getProperty(key)
+			def_prop.setProperty(key, jun_prop.getProperty(key))
+		}		
+	}
+	
+	def_prop.each{key,value ->
+		println key +":" + value		
+	}
+		
+	from ('src/main/resources'){
+		include 'config2.properties'
+		filter(ReplaceTokens,
+            tokens: ['$':'={'], beginToken : '=', endToken : '{')
+		filter(ReplaceTokens, 
+			tokens: def_prop, beginToken : '{', endToken : '}')
+	}
 }
