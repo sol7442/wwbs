@@ -161,13 +161,13 @@ public interface TreeDao<N extends TreeNode>
 	 */
 	void move(N node, N newParent) throws UniqueConstraintViolationException;
 
-	/**
-	 * Moves the given node to given position in children list of parent.
-	 * When source is identical with target, nothing happens.
-	 * @throws UniqueConstraintViolationException 
-	 * @throws IllegalArgumentException when target is below source.
-	 */
-	void moveTo(N node, N parent, int position) throws UniqueConstraintViolationException;
+//	/**
+//	 * Moves the given node to given position in children list of parent.
+//	 * When source is identical with target, nothing happens.
+//	 * @throws UniqueConstraintViolationException 
+//	 * @throws IllegalArgumentException when target is below source.
+//	 */
+//	void moveTo(N node, N parent, int position) throws UniqueConstraintViolationException;
 
 	/**
 	 * Moves the given node to position of given sibling, pushing sibling backwards in list.

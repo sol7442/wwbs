@@ -131,7 +131,7 @@ public class NstTreeTest {
 		return list;
 	}
 	
-	@Test
+	//@Test
 	public void testRemoveTask(){
 		testGetChildTask();
 		try {
@@ -170,8 +170,8 @@ public class NstTreeTest {
 	//@Test
 	public void testMoveTaskBefore2(){
 		testGetChildTask();
-		NamedNearSetTree target = taskService.find(44);
-		NamedNearSetTree before = taskService.find(36);
+		NamedNearSetTree target = taskService.find(29);
+		NamedNearSetTree before = taskService.find(34);
 		try {
 			System.out.println("taget : " + target);
 			System.out.println("before: " + before);
@@ -188,13 +188,30 @@ public class NstTreeTest {
 	//@Test
 	public void testMoveTaskAfter1(){
 		testGetChildTask();
-		NamedNearSetTree target = taskService.find(28);
-		NamedNearSetTree before = taskService.find(26);
+		NamedNearSetTree target = taskService.find(38);
+		NamedNearSetTree before = taskService.find(33);
 		try {
 			System.out.println("taget : " + target);
 			System.out.println("before: " + before);
 			
 			taskService.moveBefore(target, before);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		testGetChildTask();
+	}
+	
+	public void testMoveTask(){
+		testGetChildTask();
+		NamedNearSetTree target = taskService.find(38);
+		NamedNearSetTree parent = taskService.find(33);
+		try {
+			System.out.println("taget : " + target);
+			System.out.println("parent: " + parent);
+			
+			taskService.move(parent,target);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

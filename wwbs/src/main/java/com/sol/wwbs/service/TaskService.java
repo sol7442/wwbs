@@ -143,7 +143,7 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 		final NamedNearSetTree root = (NamedNearSetTree)location.root;
 		child.setRoot(root);
-		child.setDepth(depth);
+		setDepth(child, depth);
 		child.setLeft(location.targetLeft);
 		child.setRight(location.targetLeft + 1);
 		
@@ -155,7 +155,16 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 		return treeRepo.save(child);
 	}
-	
+	public void setDepth(NamedNearSetTree node,int depth){
+		final NamedNearSetTree root = (NamedNearSetTree)node.getRoot();
+		List<NamedNearSetTree> children = treeRepo.getChildren(root,node.getLeft(),node.getRight());
+		for(NamedNearSetTree child : children){
+			setDepth(child, depth + 1);
+		}
+		System.out.println("set depth : " + node + "==> " + depth);
+		node.setDepth(depth);
+		treeRepo.save(node);
+	}
 	@Override
 	public NamedNearSetTree addChildBefore(NamedNearSetTree sibling, NamedNearSetTree child) throws UniqueConstraintViolationException {
 		Location location = new Location(sibling.getRoot(), RelatedNodeType.SIBLING, sibling, ActionType.INSERT, sibling.getLeft());
@@ -187,39 +196,46 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 	}
 	
 	@Override
-	public void move(NamedNearSetTree before, NamedNearSetTree node) throws UniqueConstraintViolationException {
+	public void move(NamedNearSetTree parent, NamedNearSetTree node) throws UniqueConstraintViolationException {
+		Location location = location(parent, UNDEFINED_POSITION, null, ActionType.MOVE);
 		
-	}
-	@Override
-	public void moveTo(NamedNearSetTree node, NamedNearSetTree parent, int position) throws UniqueConstraintViolationException {
-		// TODO Auto-generated method stub
 		
+		int dist = sibling.getLeft() - node.getLeft() ;
+		move(location, node,dist,parent.getDepth() + 1);
 	}
+	
 	@Override
 	public void moveBefore(NamedNearSetTree node, NamedNearSetTree sibling) throws UniqueConstraintViolationException {
 		Location location = new Location(sibling.getRoot(), TreeActionLocation.RelatedNodeType.SIBLING, sibling, TreeActionLocation.ActionType.MOVE, sibling.getLeft());
 		
 		int dist = sibling.getLeft() - node.getLeft() ;
-		move(location, node,dist);
+		move(location, node,dist,sibling.getDepth());
 	}
-	private void move(Location location, NamedNearSetTree node,int dist) {
+	private void move(Location location, NamedNearSetTree node,int dist,int depth) {
 		
 		NamedNearSetTree root = (NamedNearSetTree)location.root;
 		int subTreeSize = node.getSubTreeSize();
 		
 		int range = dist;
+		int left = node.getLeft();
+		int right = node.getRight();
+		
 		if(dist < 0){
 			range -= subTreeSize * 2;
+			left  += subTreeSize * 2;
+			right += subTreeSize * 2;
 		}
+		
+		setDepth(node, depth);
 		
 		treeRepo.updateAddLeftGap(root,subTreeSize*2,location.targetLeft);
 		treeRepo.updateAddRightGap(root,subTreeSize*2, location.targetLeft);
 		
-		treeRepo.updateRangeLeft(root,range,node.getLeft(),node.getRight());
-		treeRepo.updateRangeRight(root,range, node.getLeft(),node.getRight());
-		
-		treeRepo.updateDelLeftGap(root,subTreeSize*2,node.getLeft());
-		treeRepo.updateDelRightGap(root,subTreeSize*2,node.getRight());
+		treeRepo.updateRangeLeft(root,range,left,right);
+		treeRepo.updateRangeRight(root,range, left,right);
+//		
+		treeRepo.updateDelLeftGap(root,subTreeSize*2,right);
+		treeRepo.updateDelRightGap(root,subTreeSize*2,right);
 	}
 	@Override
 	public void moveToBeRoot(NamedNearSetTree child) throws UniqueConstraintViolationException {
