@@ -33,7 +33,7 @@ public interface TreeDao<N extends TreeNode>
 	//boolean isPersistent(N entity);
 
 	/** @return the object by identity (primary key) from database. */
-	N find(Serializable id);
+	N find(int id);
 
 	/**
 	 * Updates the given persistent object. This performs explicit constraint checking
@@ -102,9 +102,9 @@ public interface TreeDao<N extends TreeNode>
 
 //	/** @return true when given node has no children, i.e. is not a container-node. */
 //	boolean isLeaf(N node);
-
-	/** @return the number of direct children of given parent node. */
-	int getChildCount(N parent);
+//
+//	/** @return the number of direct children of given parent node. */
+//	int getChildCount(N parent);
 
 	/**
 	 * Gives the children of passed parent. This method reads the full subtree under parent.
@@ -152,7 +152,7 @@ public interface TreeDao<N extends TreeNode>
 
 	/** Removes the tree under given node, including the node. Node can also be a root. */
 	void remove(N node);
-
+	void remove(int id);
 	/**
 	 * Moves the given node to end of children list of parent.
 	 * When source is identical with target, nothing happens.

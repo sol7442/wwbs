@@ -38,6 +38,17 @@ public interface NNstRepository extends JpaRepository<NamedNearSetTree,Integer> 
     void updateDelRightGap(NamedNearSetTree root,int range, int right);
 	
 	
+	@Transactional
+	@Modifying //delete t from _tree t where (t.root is null or t.root = 1) and t.lft >=14 and t.lft <=15
+	@Query("update NamedNearSetTree t set t.left = t.left + ?2 where t.root = ?1 and t.left >= ?3 and t.left <= ?4")
+	void updateRangeLeft(NamedNearSetTree root, int range, int left, int right);
+
+	@Transactional
+	@Modifying //delete t from _tree t where (t.root is null or t.root = 1) and t.lft >=14 and t.lft <=15
+	@Query("update NamedNearSetTree t set t.right = t.right + ?2 where t.root = ?1 and t.right >= ?3 and t.right <= ?4")
+	void updateRangeRight(NamedNearSetTree root, int range, int left, int right);
+	
+	
 	//@Query("select t from wbstree t where t.name = ?1 ")
 	@Query("select t from NamedNearSetTree t where t.name = ?1 ")
 	NamedNearSetTree findByName(String name);
@@ -61,24 +72,12 @@ public interface NNstRepository extends JpaRepository<NamedNearSetTree,Integer> 
 	@Modifying //delete t from _tree t where (t.root is null or t.root = 1) and t.lft >=14 and t.lft <=15
 	@Query("delete from NamedNearSetTree t where (t.root is null or t.root = ?1) and t.left >= ?2 and t.right <= ?3")
 	void delete(NamedNearSetTree root,int left, int right);
-//
-//	@Transactional
-//	@Modifying //delete t from _tree t where (t.root is null or t.root = 1) and t.lft >=14 and t.lft <=15
-//	@Query("update NamedNearSetTree t set t.name = ?1 where t.root = 1 and t.left >= ?2 and t.right <= ?3")
-//	void rename(String name, int left, int right);
-//
-//	@Transactional
-//	@Modifying 
-//	@Query("delete from NamedNearSetTree t where t.name= ?1")
-//	void deleteByName(String name);
-//	
-//	@Transactional
-//	@Modifying 
-//	@Query("delete from NamedNearSetTree t where t.left >= ?1 and t.right <= ?2")
-//	void deleteByRange(int left, int right);
+	
+	
 
 	@Query("select t from NamedNearSetTree t where t.name = ?1")
 	List<NamedNearSetTree> findByTreeName(String name);
+
 
 	
 

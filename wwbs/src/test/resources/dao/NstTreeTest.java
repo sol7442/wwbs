@@ -69,7 +69,7 @@ public class NstTreeTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testAddNearTask(){
 		try {
 			
@@ -131,108 +131,75 @@ public class NstTreeTest {
 		return list;
 	}
 	
-	//@Test
+	@Test
 	public void testRemoveTask(){
+		testGetChildTask();
 		try {
-			NamedNearSetTree root = taskService.getRoot("Admin");
-			List<NamedNearSetTree> list = taskService.getChildren(root);
-			for(NamedNearSetTree tree : list){
-				System.out.println(tree);
+			NamedNearSetTree del_task = taskService.find(45);
+			if(del_task != null){
+				taskService.remove(45);
 			}
-			
-			NamedNearSetTree del_task = list.get(list.size() - 1);
-			taskService.remove(del_task);
-		
-			list = taskService.getChildren(root);
-			for(NamedNearSetTree tree : list){
-				System.out.println(tree);
-			}
-			
+			testGetChildTask();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		testGetChildTask();
 	}
 	
-	@Test
-	public void testMoveTask(){
+	//@Test
+	public void testMoveTaskBefore1(){
 		testGetChildTask();
 		List<NamedNearSetTree> targets1 = taskService.findByName("Sub525");
 		List<NamedNearSetTree> targets2 = taskService.findByName("Sub626");
 		try {
-			NamedNearSetTree taget	 = targets1.get(0);
+			NamedNearSetTree target	 = targets1.get(0);
 			NamedNearSetTree before  = targets2.get(0);
-			//before.getp
 			
-			//taskService.move(before, taget);
+			System.out.println("taget : " + target);
+			System.out.println("before: " + before);
+			
+			taskService.moveBefore(target, before);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		testGetChildTask();
 	}
 	
-//	//@Test
-//	public void testRemoveByNameTask(){
-//		try {
-//			TaskTree root = taskService.getRoot("Admin");
-//			List<TaskTree> list = taskService.getChildren(root);
-//			for(TaskTree tree : list){
-//				System.out.println(tree);
-//			}
-//			
-//			TaskTree del_task = list.get(list.size() - 1);
-//			taskService.removeByName(del_task.getName());
-//		
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	//@Test
-//	public void testRemoveByRangeTask(){
-//		try {
-//			TaskTree root = taskService.getRoot("Admin");
-//			List<TaskTree> list = taskService.getChildren(root);
-//			for(TaskTree tree : list){
-//				System.out.println(tree);
-//			}
-//			
-//			TaskTree del_task = list.get(list.size() - 1);
-//			taskService.removeByRange(del_task.getLeft(), del_task.getRight());
-//		
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	///@Test
-//	public void testRemameTask(){
-//		try {
-//			TaskTree root = taskService.getRoot("Admin");
-//			List<TaskTree> list = taskService.getChildren(root);
-//			for(TaskTree tree : list){
-//				System.out.println(tree);
-//			}
-//			
-//			TaskTree del_task = list.get(list.size() - 1);
-//			del_task.setName("ReNamed");
-//			taskService.rename(del_task);
-//		
-//			list = taskService.getChildren(root);
-//			for(TaskTree tree : list){
-//				System.out.println(tree);
-//			}
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	//@Test
+	public void testMoveTaskBefore2(){
+		testGetChildTask();
+		NamedNearSetTree target = taskService.find(44);
+		NamedNearSetTree before = taskService.find(36);
+		try {
+			System.out.println("taget : " + target);
+			System.out.println("before: " + before);
+			
+			taskService.moveBefore(target, before);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		testGetChildTask();
+	}
 	
-//	@Test
-//	public void testFindRoot(){
-//		List<TaskTree> roots = taskService.getRoots();
-//		for(TaskTree taktree : roots){
-//			System.out.println(taktree.getTaskId() + ":("+taktree.getLeft()+")("+taktree.getRight()+")");
-//		}
-//	}
+	//@Test
+	public void testMoveTaskAfter1(){
+		testGetChildTask();
+		NamedNearSetTree target = taskService.find(28);
+		NamedNearSetTree before = taskService.find(26);
+		try {
+			System.out.println("taget : " + target);
+			System.out.println("before: " + before);
+			
+			taskService.moveBefore(target, before);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		testGetChildTask();
+	}
 }

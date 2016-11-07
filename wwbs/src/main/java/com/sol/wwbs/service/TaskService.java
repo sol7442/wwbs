@@ -1,8 +1,5 @@
 package com.sol.wwbs.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +18,7 @@ import com.sol.wwbs.util.tree.TreeActionLocation.ActionType;
 import com.sol.wwbs.util.tree.TreeActionLocation.RelatedNodeType;
 
 
+
 @Service
 public class TaskService implements TreeDao<NamedNearSetTree>{
 	@Autowired
@@ -29,14 +27,10 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 	
 	private static final int ROOT_LEFT  = 1;
 	private static final int ROOT_RIGHT = 2;
-//	@Override
-//	public boolean isPersistent(TaskTree entity) {
-//		return false;//entity.getId() == null;
-//	}
+
 	@Override
-	public NamedNearSetTree find(Serializable id) {
-		// TODO Auto-generated method stub
-		return null;
+	public NamedNearSetTree find(int id) {
+		return treeRepo.findOne(id);
 	}
 	@Override
 	public void update(NamedNearSetTree entity) throws UniqueConstraintViolationException {
@@ -87,51 +81,16 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 	}
 	@Override
 	public List<NamedNearSetTree> findDirectChildren(List<NamedNearSetTree> subNodes) {
-//		final int size = subNodes.size();
-//		if (size <= 1){	
-//			return Collections.unmodifiableList(children);
-//		}
-//		
-//		NestedSetsTreeNode parent = subNodes.get(0);
-//		subNodes = subNodes.subList(1, size);
-//		
-//		int nextChildLeft = parent.getLeft() + 1;	// this is 'left' of first child
-//		int currentChildRight = subNodes.get(0).getRight();
-//		int i = 0;
-//		for (NestedSetsTreeNode node : subNodes)	{
-//			if (isNextChild(nextChildLeft, node, currentChildRight, subNodes, i))	{
-//				if (isValidFilterChild(node))	{
-//					children.add(node);
-//					currentChildRight = node.getRight();
-//				}
-//				nextChildLeft = node.getRight() + 1;	// calculate 'left' of next child
-//			}
-//			i++;
-//		}
-		
 		return null;
-	}
-//	@Override
-//	public boolean isLeaf(NamedNearSetTree node) {
-//		return node.getLeft() + 1 == node.getRight();
-//	}
-	@Override
-	public int getChildCount(NamedNearSetTree parent) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 	@Override
 	public List<NamedNearSetTree> getChildren(NamedNearSetTree parent) {
 		return treeRepo.getChildren((NamedNearSetTree)parent.getRoot(),parent.getLeft(),parent.getRight());
-		
-		
-//		List<TaskTree> subTree = getSubTreeDepthFirst(parent);
-//		return findDirectChildren(subTree);
 	}
-	private List<NamedNearSetTree> getSubTreeDepthFirst(NamedNearSetTree parent) {
-		//select * from _tree t where t.root = 1 and t.lft >=1 and t.rgt <=2 order by t.lft;
-		return null;
-	}
+//	private List<NamedNearSetTree> getSubTreeDepthFirst(NamedNearSetTree parent) {
+//		//select * from _tree t where t.root = 1 and t.lft >=1 and t.rgt <=2 order by t.lft;
+//		return null;
+//	}
 	@Override
 	public NamedNearSetTree getRoot(NamedNearSetTree node) {
 		// TODO Auto-generated method stub
@@ -218,21 +177,14 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 		
 		treeRepo.delete(root,node.getLeft(),node.getRight());
 		
-		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
-		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
+		treeRepo.updateDelLeftGap(root,node.getSubTreeSize()*2,node.getLeft());
+		treeRepo.updateDelRightGap(root,node.getSubTreeSize()*2,node.getRight());
 	}
-	
-
-//	public void rename(TaskTree node) {
-//		final TaskTree root = (TaskTree)node.getRoot();
-//		System.out.println(node.toString() + ":" +node.getLeft() + "," + node.getRight());
-//		
-//		treeRepo.rename(node.getName(),node.getLeft(),node.getRight());
-//		
-////		treeRepo.updateDelLeftGap(root,node.numberOfNodesInSubTree()*2,node.getLeft());
-////		treeRepo.updateDelRightGap(root,node.numberOfNodesInSubTree()*2,node.getRight());
-//		
-//	}
+	@Override
+	public void remove(int id) {
+		NamedNearSetTree del_node = treeRepo.findOne(id);
+		remove(del_node);
+	}
 	
 	@Override
 	public void move(NamedNearSetTree before, NamedNearSetTree node) throws UniqueConstraintViolationException {
@@ -245,8 +197,29 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 	}
 	@Override
 	public void moveBefore(NamedNearSetTree node, NamedNearSetTree sibling) throws UniqueConstraintViolationException {
-		// TODO Auto-generated method stub
+		Location location = new Location(sibling.getRoot(), TreeActionLocation.RelatedNodeType.SIBLING, sibling, TreeActionLocation.ActionType.MOVE, sibling.getLeft());
 		
+		int dist = sibling.getLeft() - node.getLeft() ;
+		move(location, node,dist);
+	}
+	private void move(Location location, NamedNearSetTree node,int dist) {
+		
+		NamedNearSetTree root = (NamedNearSetTree)location.root;
+		int subTreeSize = node.getSubTreeSize();
+		
+		int range = dist;
+		if(dist < 0){
+			range -= subTreeSize * 2;
+		}
+		
+		treeRepo.updateAddLeftGap(root,subTreeSize*2,location.targetLeft);
+		treeRepo.updateAddRightGap(root,subTreeSize*2, location.targetLeft);
+		
+		treeRepo.updateRangeLeft(root,range,node.getLeft(),node.getRight());
+		treeRepo.updateRangeRight(root,range, node.getLeft(),node.getRight());
+		
+		treeRepo.updateDelLeftGap(root,subTreeSize*2,node.getLeft());
+		treeRepo.updateDelRightGap(root,subTreeSize*2,node.getRight());
 	}
 	@Override
 	public void moveToBeRoot(NamedNearSetTree child) throws UniqueConstraintViolationException {
@@ -351,15 +324,5 @@ public class TaskService implements TreeDao<NamedNearSetTree>{
 	public List<NamedNearSetTree> findByName(String name) {
 		return treeRepo.findByTreeName(name);
 	}
-//	public NamedNearSetTree findByName(String string) {
-//		return treeRepo.findByTreeName(name);;
-//	}
-
-//	public void removeByName(String name) {
-//		treeRepo.deleteByName(name);
-//	}
-//	public void removeByRange(int left, int right) {
-//		treeRepo.deleteByRange(left, right);
-//	}
 
 }

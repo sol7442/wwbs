@@ -11,10 +11,10 @@ import java.io.Serializable;
  */
 public interface TreeNode extends Cloneable
 {
-	/**
-	 * @return the primary key of this tree node.
-	 */
-	Serializable getId();
+//	/**
+//	 * @return the primary key of this tree node.
+//	 */
+//	Serializable getId();
 	
 	/**
 	 * For copy and unique constraint-checks cloning is required.

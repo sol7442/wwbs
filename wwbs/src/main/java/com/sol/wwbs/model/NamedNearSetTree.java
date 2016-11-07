@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.*;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
+import com.sun.jmx.snmp.tasks.Task;
 
 
 /**
@@ -35,7 +36,7 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 //	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 //	private List<Task> tasks;
 	
-	@ManyToOne(targetEntity = NamedNearSetTree.class)//, optional=true, fetch=FetchType.LAZY, cascade = CascadeType.REFRESH  )
+	@ManyToOne(targetEntity = NamedNearSetTree.class)
 	@JoinColumn(name="root", nullable = true, updatable = true)
 	private NamedNearSetTree root;
 
@@ -43,15 +44,15 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 	public NamedNearSetTree() {
 	}
 
-	public int getTaskId() {
+	public int getId() {
 		return this.id;
 	}
 
-	public void setTaskId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public int numberOfNodesInSubTree(){
+	public int getSubTreeSize(){
 		return (this.right - this.left)/2 + 1;
 	}
 	public int getDepth() {
@@ -99,10 +100,10 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 		return clone;
 	}
 
-	@Override
-	public Serializable getId() {
-		return this.id;
-	}
+//	@Override
+//	public Serializable getId() {
+//		return this.id;
+//	}
 
 	public String getName() {
 		return name;
@@ -130,6 +131,7 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 		buffer.append("[").append(this.root.getId()).append("]");
 		buffer.append("[").append(this.id).append("]");
 		buffer.append("[").append(this.name).append("]");
+		buffer.append("(").append(this.depth).append(")");
 		buffer.append(":").append(this.left).append(",").append(this.right);
 		
 		return buffer.toString();
