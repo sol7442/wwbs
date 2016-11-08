@@ -15,14 +15,14 @@ import com.sun.jmx.snmp.tasks.Task;
  */
 @Entity
 @Table(name="_tree")
-public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
+public class NsTree implements Serializable, NestedSetsTreeNode {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id = -1;
 	
-	private String name;
+//	private String name;
 	
 	@Column(name="lft")
 	private int left;
@@ -36,12 +36,12 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 //	@OneToMany(mappedBy = "tree", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 //	private List<Task> tasks;
 	
-	@ManyToOne(targetEntity = NamedNearSetTree.class)
-	@JoinColumn(name="root", nullable = true, updatable = true)
-	private NamedNearSetTree root;
+	@ManyToOne(targetEntity = NsTree.class)
+	@JoinColumn(name="root", nullable = true, updatable = false)
+	private NsTree root;
 
 	
-	public NamedNearSetTree() {
+	public NsTree() {
 	}
 
 	public int getId() {
@@ -90,47 +90,37 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 
 	@Override
 	public void setRoot(NestedSetsTreeNode root) {
-		this.root = (NamedNearSetTree)root;
+		this.root = (NsTree)root;
 	}
 
 	@Override
 	public NestedSetsTreeNode clone() {
-		NamedNearSetTree clone = new NamedNearSetTree();
+		NsTree clone = new NsTree();
 		clone.setRoot(getRoot());
 		return clone;
 	}
 
-//	@Override
-//	public Serializable getId() {
-//		return this.id;
-//	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-
-//	public List<Task> getTasks() {
-//		return tasks;
+//	public String getName() {
+//		return name;
 //	}
 //
-//	public void addTasK(Task task) {
-//		if(this.tasks == null){
-//			this.tasks = new ArrayList<Task>();
-//		}
-//		this.tasks.add(task);
+//	public void setName(String name) {
+//		this.name = name;
 //	}
 	
+	private String getNodeDepthString() {
+		StringBuffer buffer = new StringBuffer();
+		for(int i=0;i<this.depth;i++){
+			buffer.append("-");
+		}
+		return buffer.toString();
+	}
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
-		
+		buffer.append(getNodeDepthString());
 		buffer.append("[").append(this.root.getId()).append("]");
 		buffer.append("[").append(this.id).append("]");
-		buffer.append("[").append(this.name).append("]");
+//		buffer.append("[").append(this.name).append("]");
 		buffer.append("(").append(this.depth).append(")");
 		buffer.append(":").append(this.left).append(",").append(this.right);
 		
@@ -139,6 +129,9 @@ public class NamedNearSetTree implements Serializable, NestedSetsTreeNode {
 
 	@Override
 	public boolean isRoot() {
+		if(root == null){
+			return false;
+		}
 		return this.getId() == root.getId();
 	}
 

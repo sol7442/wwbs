@@ -61,6 +61,7 @@ public class RepositoryConfig {
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        
         entityManagerFactoryBean.setDataSource(dataSource());
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
         entityManagerFactoryBean.setPackagesToScan(getPackagesToScan());
@@ -72,6 +73,7 @@ public class RepositoryConfig {
         properties.setProperty("hbm2ddl.auto", env.getProperty("hibernate.hdm2ddl")); 
         
         entityManagerFactoryBean.setJpaProperties(properties);
+        entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());
        
         System.out.println("Config : entityManagerFactory" + env.getProperty("hibernate.dialect")); 
         return entityManagerFactoryBean;
@@ -82,7 +84,7 @@ public class RepositoryConfig {
 	    HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
 	    jpaVendorAdapter.setGenerateDdl(true);
 	    jpaVendorAdapter.setShowSql(true);
-
+	    
 	    return jpaVendorAdapter;
 	}
 	

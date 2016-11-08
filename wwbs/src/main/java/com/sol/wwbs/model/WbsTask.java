@@ -10,11 +10,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="_task")
-public class WorkBreakdownStructureTask implements Serializable{
+public class WbsTask implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	public enum TYPE{
@@ -29,18 +30,17 @@ public class WorkBreakdownStructureTask implements Serializable{
 	private String name;
 	
 	private String desc;
-//	
-//	@ManyToOne(fetch=FetchType.LAZY)
-//	@JoinColumn(name="treeId")
-//	private TaskTree tree;
 	
+	@OneToOne
+	@JoinColumn(name="treeId")
+	private NsTree tree;
 	
-//	public void setTaskTree(TaskTree tree){
-//		this.tree = tree;
-//	}
-//	public TaskTree getTaskTree(){
-//		return this.tree;
-//	}
+	public void setTaskTree(NsTree tree){
+		this.tree = tree;
+	}
+	public NsTree getTaskTree(){
+		return this.tree;
+	}
 	
 	public String getName() {
 		return name;
