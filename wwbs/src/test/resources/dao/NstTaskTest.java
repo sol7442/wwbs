@@ -12,7 +12,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.sol.wwbs.config.RepositoryConfig;
 import com.sol.wwbs.model.NsTree;
-import com.sol.wwbs.service.NsTreeService;
 import com.sol.wwbs.util.tree.TreeDao;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,7 +25,7 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetRoots(){
-		List<NsTree> root_list = treeService.findRoots();
+		List<NsTree> root_list = treeService.getRoots();
 		System.out.println("=[testGetRoots]=====");
 		for(NsTree node : root_list){
 			System.out.println(node);
@@ -35,15 +34,15 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetTreeById(){
-		NsTree root_node = treeService.find(51);
+		NsTree root_node = treeService.get(51);
 		System.out.println("=[testGetTreeById]=====");
 		System.out.println(root_node);
 	}
 	
 	//@Test
 	public void testGetChildren(){
-		NsTree parent_node = treeService.find(23);
-		List<NsTree> node_list = treeService.findChildren(parent_node);
+		NsTree parent_node = treeService.get(23);
+		List<NsTree> node_list = treeService.getChildren(parent_node);
 		System.out.println("=[testGetChildren]=====");
 		for(NsTree node : node_list){
 			System.out.println(node);
@@ -52,8 +51,8 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetSubtree(){
-		NsTree parent_node = treeService.find(23);
-		List<NsTree> node_list = treeService.findSubTree(parent_node);
+		NsTree parent_node = treeService.get(23);
+		List<NsTree> node_list = treeService.getSubTree(parent_node);
 		System.out.println("=[testGetSubtree]=====");
 		for(NsTree node : node_list){
 			System.out.println(node);
@@ -62,8 +61,8 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetSubtreeError(){
-		NsTree parent_node = treeService.find(102);
-		List<NsTree> node_list = treeService.findSubTree(parent_node);
+		NsTree parent_node = treeService.get(102);
+		List<NsTree> node_list = treeService.getSubTree(parent_node);
 		System.out.println("=[testGetSubtreeError]=====");
 		for(NsTree node : node_list){
 			System.out.println(node);
@@ -72,15 +71,15 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetParent(){
-		NsTree node = treeService.find(38);
-		NsTree parent_node = treeService.findParent(node);
+		NsTree node = treeService.get(38);
+		NsTree parent_node = treeService.getParent(node);
 		System.out.println("=[testGetParent]=====");
 		System.out.println(parent_node);
 	}
 	
 	//@Test
 	public void testGetPath(){
-		NsTree node = treeService.find(36);
+		NsTree node = treeService.get(36);
 		List<NsTree> node_path = treeService.getPath(node);
 		System.out.println("=[testGetPath]=====");
 		for(NsTree path : node_path){
@@ -91,9 +90,9 @@ public class NstTaskTest {
 	
 	//@Test
 	public void testGetAll(){
-		NsTree root = treeService.findRoots().get(0);
-		List<NsTree> node_path = treeService.findSubTree(root);
-		System.out.println("=[testGetAll]=====");
+		NsTree root = treeService.getRoots().get(0);
+		List<NsTree> node_path = treeService.getSubTree(root);
+		System.out.println(root);
 		for(NsTree path : node_path){
 			System.out.println(path);
 		}
@@ -102,10 +101,10 @@ public class NstTaskTest {
 	//@Test
 	public void testRemove(){
 		try{
-			List<NsTree> root_list = treeService.findRoots();
+			List<NsTree> root_list = treeService.getRoots();
 			System.out.println("=[Size : ]=====" + root_list.get(0).getSubTreeSize());
 			treeService.remove(48);
-			root_list = treeService.findRoots();
+			root_list = treeService.getRoots();
 			System.out.println("=[Size : ]=====" + root_list.get(0).getSubTreeSize());
 			testGetAll();
 		}catch (Exception e) {
@@ -116,7 +115,7 @@ public class NstTaskTest {
 	//@Test
 	public void testRemove2(){
 		try{
-			NsTree del_node = treeService.find(49);
+			NsTree del_node = treeService.get(49);
 			treeService.remove(del_node.getId());
 			testGetAll();
 		}catch(Exception e){
@@ -124,11 +123,11 @@ public class NstTaskTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testAdd(){
 		try{
 			System.out.println("=[testAdd : ]=====");
-			NsTree root =  treeService.find(1);
+			NsTree root =  treeService.get(1);
 			NsTree new_parent = new NsTree();
 			NsTree new_child = new NsTree();
 			NsTree new_subchild = new NsTree();
@@ -149,7 +148,7 @@ public class NstTaskTest {
 			
 			testGetAll();
 			
-//			new_parent = treeService.find(new_parent.getId());
+//			new_parent = treeService.get(new_parent.getId());
 			treeService.remove(new_parent);
 //			testGetAll();
 		}catch (Exception e) {
@@ -157,6 +156,31 @@ public class NstTaskTest {
 		}
 	}
 	
+	@Test
+	public void testMove(){
+		try{
+			System.out.println("=[testMove : ]=====");
+			NsTree root =  treeService.get(1);
+			
+			testGetAll();
+			
+			List<NsTree> children = treeService.getChildren(root);
+			NsTree sibling  = children.get(1);
+			NsTree move_node = children.get(2);
+			
+			treeService.moveBefore(move_node, sibling);
+			NsTree new_child = new NsTree();
+			new_child = treeService.addChild(root, new_child);			
+			
+			treeService.move(sibling, new_child);
+			testGetAll();
+			
+			treeService.remove(new_child);
+			
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
 	
 	
 //	

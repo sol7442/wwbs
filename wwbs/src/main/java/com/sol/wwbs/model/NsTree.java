@@ -1,12 +1,9 @@
 package com.sol.wwbs.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.*;
 import com.sol.wwbs.util.tree.NestedSetsTreeNode;
-import com.sun.jmx.snmp.tasks.Task;
 
 
 /**

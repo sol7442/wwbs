@@ -28,14 +28,14 @@ public class NsTreeService implements TreeDao<NsTree>{
 
 	
 	@Override
-	public NsTree find(int id) {
+	public NsTree get(int id) {
 		return treeRepo.findOne(id);
 	}
 //	public List<NsTree> find(String name) {
 //		return treeRepo.findByTreeName(name);
 //	}
 	
-	public List<NsTree> findAll(NsTree root) {
+	public List<NsTree> getAll(NsTree root) {
 		return treeRepo.findAll(root);
 	}
 	
@@ -51,7 +51,7 @@ public class NsTreeService implements TreeDao<NsTree>{
 	}
 	
 	@Override
-	public List<NsTree> findRoots() {
+	public List<NsTree> getRoots() {
 		return treeRepo.getRoots();
 	}
 //	public NsTree findRoot(String name) {
@@ -65,14 +65,14 @@ public class NsTreeService implements TreeDao<NsTree>{
 		
 	}
 	@Override
-	public List<NsTree> findSubTree(NsTree parent) {
+	public List<NsTree> getSubTree(NsTree parent) {
 		if(parent == null){
 			return new ArrayList<>();
 		}
 		return treeRepo.findSubTree((NsTree)parent.getRoot(),parent.getLeft(),parent.getRight());
 	}
 	@Override
-	public List<NsTree> findChildren(NsTree parent) {
+	public List<NsTree> getChildren(NsTree parent) {
 		if(parent == null){
 			return new ArrayList<>();
 		}
@@ -80,7 +80,7 @@ public class NsTreeService implements TreeDao<NsTree>{
 	}
 	
 	@Override
-	public NsTree findParent(NsTree node) {
+	public NsTree getParent(NsTree node) {
 		if(node.isRoot()) return null;
 		return treeRepo.findParent(node.getRoot(),node.getLeft(),node.getRight(),node.getDepth() - 1);
 	}
@@ -90,23 +90,36 @@ public class NsTreeService implements TreeDao<NsTree>{
 	}
 	
 	@Override
+	@Transactional
 	public NsTree addChild(NsTree parent, NsTree child)  {
 		return addChildAt(parent, child, UNDEFINED_POSITION);
 	}
 	
 	@Override
-	public NsTree addChildAt(NsTree parent, NsTree child, int position)
-			 {
-		Location location = location(parent, position, null, ActionType.INSERT);
-		
-		return addChild(child,location,parent.getDepth() + 1);
+	@Transactional
+	public NsTree addChildAt(NsTree parent, NsTree child, int position){
+		final NsTree reflash_parent = reflash(parent);
+		Location location = location(reflash_parent, position, null, ActionType.INSERT);
+		return addChild(child,location,reflash_parent.getDepth() + 1);
 	}
 	
 	@Override
-	public NsTree addChildBefore(NsTree sibling, NsTree child)  {
-		Location location = new Location(sibling.getRoot(), RelatedNodeType.SIBLING, sibling, ActionType.INSERT, sibling.getLeft());
-		return addChild(child,location,sibling.getDepth());
+	public NsTree reflash(NsTree node) {
+		return treeRepo.findOne(node.getId());
 	}
+
+	@Override
+	@Transactional
+	public NsTree addChildBefore(NsTree sibling, NsTree child)  {
+		final NsTree reflash_sibling = reflash(sibling);
+		
+		Location location = new Location(
+				reflash_sibling.getRoot(),
+				RelatedNodeType.SIBLING, reflash_sibling, ActionType.INSERT, reflash_sibling.getLeft());
+		
+		return addChild(child,location,reflash_sibling.getDepth());
+	}
+	
 	
 	private NsTree addChild(NsTree child,Location location,int depth) {
 		if(child.isPersistent()){
@@ -120,16 +133,14 @@ public class NsTreeService implements TreeDao<NsTree>{
 		child.setLeft(location.targetLeft);
 		child.setRight(location.targetLeft + 1);
 		
-		//checkUniqueness
 		treeRepo.updateAddLeftGap(root,2,location.targetLeft);
 		treeRepo.updateAddRightGap(root,2, location.targetLeft);
 		
-		treeRepo.flush();
-		
 		return treeRepo.save(child);
 	}
-	public void changeDepth(NsTree node,int depth){
-		List<NsTree> children =  findChildren(node);
+	
+	private void changeDepth(NsTree node,int depth){
+		List<NsTree> children =  getChildren(node);
 		for(NsTree child : children){
 			changeDepth(child, depth + 1);
 		}
@@ -142,7 +153,7 @@ public class NsTreeService implements TreeDao<NsTree>{
 	}
 	
 	@Override
-	@Transactional(rollbackFor=Exception.class)
+	@Transactional
 	public void remove(NsTree node) {
 		if(node == null ){
 			throw new IllegalArgumentException("Node is null  "+node);
@@ -152,15 +163,15 @@ public class NsTreeService implements TreeDao<NsTree>{
 			throw new IllegalArgumentException("Node is not persistent: "+node);
 		}
 
-		final NsTree remove_node = treeRepo.findOne(node.getId());
-		final NsTree root = (NsTree)remove_node.getRoot();
-		if(remove_node.isRoot()){
+		final NsTree reflash_node = reflash(node);
+		final NsTree root = (NsTree)reflash_node.getRoot();
+		if(reflash_node.isRoot()){
 			treeRepo.updateRootNull(root, node.getLeft(),node.getRight());
 		}
 		
-		treeRepo.delete(root,remove_node.getLeft(),remove_node.getRight());
-		treeRepo.updateDelLeftGap(root,remove_node.getSubTreeSize()*2,remove_node.getLeft());
-		treeRepo.updateDelRightGap(root,remove_node.getSubTreeSize()*2,remove_node.getRight());
+		treeRepo.delete(root,reflash_node.getLeft(),reflash_node.getRight());
+		treeRepo.updateDelLeftGap(root,reflash_node.getSubTreeSize()*2,reflash_node.getLeft());
+		treeRepo.updateDelRightGap(root,reflash_node.getSubTreeSize()*2,reflash_node.getRight());
 	}
 	@Override
 	public void remove(int id) {
@@ -169,22 +180,32 @@ public class NsTreeService implements TreeDao<NsTree>{
 	}
 	
 	@Override
+	@Transactional
 	public void move(NsTree parent, NsTree node)  {
-		Location location = location(parent, UNDEFINED_POSITION, null, ActionType.MOVE);
-		int dist = parent.getRight() - node.getLeft() ;
-		move(location, node,dist,parent.getDepth() + 1);
+		final NsTree reflash_parent = reflash(parent);
+		final NsTree reflash_node = reflash(node);
+		
+		Location location = location(reflash_parent, UNDEFINED_POSITION, null, ActionType.MOVE);
+		int dist = reflash_parent.getRight() - reflash_node.getLeft() ;
+		move(location, reflash_node,dist,reflash_parent.getDepth() + 1);
 	}
 	
 	@Override
+	@Transactional
 	public void moveBefore(NsTree node, NsTree sibling)  {
-		Location location = new Location(sibling.getRoot(), TreeActionLocation.RelatedNodeType.SIBLING, sibling, TreeActionLocation.ActionType.MOVE, sibling.getLeft());
+		final NsTree reflash_sibling = reflash(sibling);
+		final NsTree reflash_node = reflash(node);
 		
-		int dist = sibling.getLeft() - node.getLeft() ;
-		move(location, node,dist,sibling.getDepth());
+		Location location = new Location(reflash_sibling.getRoot(), 
+				TreeActionLocation.RelatedNodeType.SIBLING, reflash_sibling, 
+				TreeActionLocation.ActionType.MOVE, reflash_sibling.getLeft());
+		
+		int dist = reflash_sibling.getLeft() - reflash_node.getLeft() ;
+		move(location, reflash_node,dist,reflash_sibling.getDepth());
 	}
-	//@Transactional
+	
 	private void move(Location location, NsTree node,int dist,int depth) {
-		
+		//TODO - validate move node position
 		NsTree root = (NsTree)location.root;
 		int subTreeSize = node.getSubTreeSize();
 		
@@ -240,7 +261,7 @@ public class NsTreeService implements TreeDao<NsTree>{
 		}
 		
 		 
-		List<NsTree> children = findChildren(parent);
+		List<NsTree> children = getChildren(parent);
 		if (position >= children.size()){
 			return new Location(parent.getRoot(), TreeActionLocation.RelatedNodeType.PARENT, parent, actionType, parent.getRight());
 		}
