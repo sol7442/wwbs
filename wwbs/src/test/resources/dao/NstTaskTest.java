@@ -30,7 +30,7 @@ public class NstTaskTest {
 		for(NsTree node : root_list){
 			System.out.println(node);
 		}
-	}
+	}	
 	
 	//@Test
 	public void testGetTreeById(){
